@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ $# != 1 ]; then
+    printf "Usage: $0 filename\n"
+    exit 1
+fi
+
+file=$1
+if [ ! -e $file.orig ]; then
+    cp $file $file.orig
+fi
+
+vi $file
+
+printf 'Regenerate patch files? (y/n) '
+read resp
+if [ 0$resp = 0y ]; then
+    mkpatches
+fi
+
