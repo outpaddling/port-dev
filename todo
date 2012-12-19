@@ -1,0 +1,3 @@
+mkpatches take argument filename(s)
+    use in patch-vi to limit patch creation to file edited
+
