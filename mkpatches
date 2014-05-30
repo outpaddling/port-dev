@@ -8,6 +8,7 @@ fi
 # Determine WRKSRC
 PORTNAME=`awk '$1 == "PORTNAME=" { print $2 }' Makefile`
 PORTVERSION=`awk '$1 == "PORTVERSION=" { print $2 }' Makefile`
+DISTNAME=`awk '$1 == "DISTNAME=" { print $2 }' Makefile`
 if egrep -q '^WRKSRC=' Makefile; then
     WRKSRC=`awk '$1 == "WRKSRC=" { print $2 }' Makefile`
     printf "Raw WRKSRC = %s\n" $WRKSRC
@@ -16,7 +17,9 @@ elif egrep -q '^DISTNAME=' Makefile; then
 else
     WRKSRC=work/${PORTNAME}-${PORTVERSION}
 fi
+# Do DISTNAME before PORTNAME and PORTVERSION in case it references them.
 WRKSRC=`echo $WRKSRC | sed -e 's|${WRKDIR}|work|g' \
+    -e 's|${DISTNAME}|'$DISTNAME'|g' \
     -e 's|${PORTNAME}|'$PORTNAME'|g' \
     -e 's|${PORTVERSION}|'$PORTVERSION'|g'`
 
