@@ -1,0 +1,80 @@
+#!/bin/csh
+
+switch(`uname`)
+
+case    'FreeBSD':
+    make deinstall
+    printf "Remove distfile[s]? (y/n) "
+    if ( "$<" == 'y' ) then
+	make distclean
+    else
+	make clean
+    endif
+    make makesum
+    # fgrep -qi md5 distinfo
+    if ( 0 ) then # $status != 0 ) then
+	# Add md5 sums for older ports trees
+	set distfile=`awk '$1 == "SHA256" { print $2 }' distinfo | tr -d '()'`
+	pushd /usr/ports/distfiles
+	set md5=`md5 $distfile`
+	popd
+	echo "$md5" > distinfo.temp
+	cat distinfo >> distinfo.temp
+	mv -f distinfo.temp distinfo
+    endif
+    
+    printf "Regenerate plist? (y/n) "
+    if ( "$<" == 'y' ) then
+	genplist clean
+	genplist create /tmp
+	vi pkg-plist.new
+	if ( -e pkg-plist.new ) then
+	    genplist diff
+	    printf "Commit? (y/n) "
+	    if ( "$<" == 'y' ) then
+		genplist commit
+	    else
+		exit 0
+	    endif
+	endif
+	genplist test
+	genplist clean
+	printf "Continue? (y/n) "
+	if ( "$<" != 'y' ) exit
+    endif
+    make reinstall
+    if ( $status == 0 ) then
+	cd ../..
+	printf "Updating repo...\n"
+	svn up
+	printf "Comitting changes...\n"
+	svn ci -m 'Auto-updated by remake'
+    endif
+    breaksw
+
+case    'Darwin':
+    port -f uninstall
+    port clean --all
+    
+    # Remove checksum(s) from Portfile
+    # Find "checksums" in field 1, and remove all lines ending with '\'.
+    awk ' { if ( $1 == "checksums" ) { while ( $NF == "\\" ) getline; } else { print $0 }}' Portfile >! temp
+    /bin/mv -f Portfile Portfile.bak
+    /bin/mv temp Portfile
+    sleep 2     # port complains that Portfile is from future
+    
+    # Append new checksums to Portfile
+    # Find "checksums" in field 1, then print all lines ending with '\'
+    # and the one after.
+    port -d checksum | & awk ' { if ( $1 == "checksums" ) { while ( $NF == "\\" ) { print $0; getline; } print $0; } }' >> Portfile
+    sleep 2     # port complains that Portfile is from future
+    
+    port install
+    if ( $status == 0 ) then
+	cd ../../..
+	./update-web-tree
+	update-jb-ports
+    endif
+    breaksw
+endsw
+
