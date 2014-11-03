@@ -1,5 +1,7 @@
 #!/bin/csh
 
+alias pause 'printf "Press return to continue..."; set junk=$<'
+
 switch(`uname`)
 
 case    'FreeBSD':
@@ -27,6 +29,7 @@ case    'FreeBSD':
     if ( "$<" == 'y' ) then
 	genplist clean
 	genplist create /tmp
+	pause
 	vi pkg-plist.new
 	if ( -e pkg-plist.new ) then
 	    genplist diff
