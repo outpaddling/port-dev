@@ -5,16 +5,16 @@ if [ $# != 1 ]; then
     exit 1
 fi
 
-file=$1
-if [ ! -e $file.orig ]; then
-    cp $file $file.orig
+file="$1"
+if [ ! -e "$file.orig" ]; then
+    cp "$file" "$file.orig"
 fi
 
-vi $file
+vi "$file"
 
-printf 'Regenerate patch files? (y/n) '
+printf 'Regenerate patch file? (y/n) '
 read resp
 if [ 0$resp = 0y ]; then
-    mkpatches
+    mkpatch "$file"
 fi
 

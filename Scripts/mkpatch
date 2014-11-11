@@ -1,7 +1,40 @@
 #!/bin/sh
 
+##########################################################################
+#   Script description:
+#       
+#   Arguments:
+#       
+#   Returns:
+#       
+#   History:
+#   Date        Name        Modification
+#   2014-11-10  Charlie &   Begin
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0 filename\n"
+    exit 1
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 1 ]; then
+    usage
+fi
+
+filename="$1"
 if [ ! -e pkg-descr ]; then
     printf "$0 must be run from the port directory.\n"
+    exit 1
+fi
+
+if [ ! -e "$filename.orig" ]; then
+    printf "Error: No $filename.orig present.\n"
     exit 1
 fi
 
@@ -35,12 +68,9 @@ mkdir -p files
 port_dir=`pwd`
 
 # Go to WRKSRC and generate patch file
-cd ${WRKSRC}
-pwd
-list=`find * -name '*.orig'`
-for file in ${list}; do
-    echo ${file} ${file%.orig}
-    patch_file='patch-'`echo ${file%.orig} | sed -e 's|_|__|g' | sed -e 's|/|_|g'`
-    diff -u ${file} ${file%.orig} > ${port_dir}/files/$patch_file
-done
+echo $WRKSRC
+cd $WRKSRC
+file=${filename#$WRKSRC/}
+patch_file='patch-'`echo "$file" | sed -e 's|_|__|g' | sed -e 's|/|_|g'`
+diff -u "$file.orig" "$file" > $port_dir/files/$patch_file
 
