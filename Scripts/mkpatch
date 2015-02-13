@@ -72,5 +72,5 @@ echo $WRKSRC
 cd $WRKSRC
 file=${filename#$WRKSRC/}
 patch_file='patch-'`echo "$file" | sed -e 's|_|__|g' | sed -e 's|/|_|g'`
-diff -u "$file.orig" "$file" > $port_dir/files/$patch_file
+diff -uE "$file.orig" "$file" > $port_dir/files/$patch_file
 
