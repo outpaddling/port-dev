@@ -1,0 +1,59 @@
+#!/bin/sh
+
+if [ ! -e pkg-descr ] && ! fgrep -q MASTERDIR Makefile; then
+    printf "You must run this script from within port directory.\n"
+    exit 1
+fi
+
+portname=$(basename $(pwd))
+#category=$(awk '$1 == "CATEGORIES=" { print $2 }' Makefile)
+category=$(basename $(dirname $(pwd)))
+if [ $# = 1 ]; then
+    old_portname=$1
+else
+    old_portname=$portname
+fi
+#printf "port name = $portname\n"
+#printf "category = $category\n"
+
+if [ ! -e /usr/ports/$category/$old_portname ]; then
+    printf "Error: /usr/ports/$category/$old_portname does not exist.\n"
+    exit 1
+fi
+
+save_cwd=`pwd`
+if [ -e work ]; then
+    mv work ../work.$portname
+fi
+diff -ruN --exclude=CVS --exclude=.svn /usr/ports/$category/$old_portname `pwd` > ~bacon/$portname-diff.txt
+if [ -e ../work.$portname ]; then
+    mv ../work.$portname work
+fi
+
+category=$(basename $(dirname $(pwd)))
+
+cat << EOM
+
+Submit a PR with the file ~bacon/$portname-shar.txt.
+
+Summary:    New port: $category/$portname
+	    Maintainer update: $category/$portname
+
+Category:   ports
+
+Class:      New port:   change-request
+	    Update:     maintainer update if you're the maintainer
+			change-request if not
+	    
+EOM
+
+printf "uname -a:\n"
+uname -a
+
+if [ -e pkg-descr ]; then
+    printf "\npkg-descr:\n"
+    cat pkg-descr
+else
+    printf 'No pkg-descr.\n'
+fi
+

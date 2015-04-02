@@ -1,0 +1,50 @@
+#!/bin/sh -e
+
+if [ ! -e pkg-descr ] && ! fgrep MASTERDIR Makefile; then
+    printf "You must run this script from within port directory.\n"
+    exit 1
+fi
+
+portlint -A
+make clean
+
+portname=$(basename $(pwd))
+#printf "port name = $portname\n"
+
+save_cwd=`pwd`
+cd ..
+if [ -e $portname/work ]; then
+    mv $portname/work work.$portname
+fi
+mv $portname/distinfo $portname.distinfo
+fgrep -v MD5 $portname.distinfo > $portname/distinfo
+shar `find $portname` > ~bacon/$portname-shar.txt
+mv -f $portname.distinfo $portname/distinfo
+if [ -e work.$portname ]; then
+    mv work.$portname $portname/work
+fi
+cd $save_cwd
+
+category=$(basename $(dirname $(pwd)))
+
+cat << EOM
+
+Submit a PR with the file ~bacon/$portname-shar.txt.
+
+Summary:    New port: $category/$portname
+	    Maintainer update: $category/$portname
+
+Category:   ports
+
+Class:      New port:   change-request
+	    Update:     maintainer update if you're the maintainer
+			change-request if not
+	    
+EOM
+
+printf "uname -a:\n"
+uname -a
+
+printf "\npkg-descr:\n"
+cat pkg-descr
+

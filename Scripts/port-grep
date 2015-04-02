@@ -1,0 +1,13 @@
+#!/bin/sh
+
+for dir in /usr/ports /usr/wip /usr/pkgsrc ~/Pkgsrc/pkgsrc-1; do
+    if [ -d $dir ]; then
+	for category in $dir/*; do
+	    #echo $category
+	    if [ -e $category/Makefile ]; then
+		fgrep $@ $category/*/Makefile
+	    fi
+	done
+    fi
+done
+
