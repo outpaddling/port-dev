@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 for dir in /usr/ports /usr/wip /usr/pkgsrc ~/Pkgsrc/pkgsrc-1; do
     if [ -d $dir ]; then

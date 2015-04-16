@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 if [ ! -e pkg-descr ] && ! fgrep -q MASTERDIR Makefile; then
     printf "You must run this script from within port directory.\n"
