@@ -1,10 +1,10 @@
-#!/bin/sh -e
+#!/bin/sh
 
-for dir in /usr/ports /usr/wip /usr/pkgsrc ~/Pkgsrc/pkgsrc-1; do
+for dir in /usr/ports /usr/wip; do
     if [ -d $dir ]; then
 	for category in $dir/*; do
-	    #echo $category
-	    if [ -e $category/Makefile ]; then
+	    echo $category
+	    if [ -e $category/Makefile ] && [ $category != /usr/ports/Templates ]; then
 		fgrep $@ $category/*/Makefile
 	    fi
 	done
