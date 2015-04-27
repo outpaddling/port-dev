@@ -4,7 +4,7 @@ for dir in /usr/ports /usr/wip; do
     if [ -d $dir ]; then
 	for category in $dir/*; do
 	    if [ -e $category/Makefile ] && [ $category != /usr/ports/Templates ]; then
-		fgrep $@ $category/*/Makefile
+		grep $@ $category/*/Makefile
 	    fi
 	done
     fi
