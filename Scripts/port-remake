@@ -27,23 +27,23 @@ case    'FreeBSD':
     
     printf "Regenerate plist? (y/n) "
     if ( "$<" == 'y' ) then
-	genplist clean
-	genplist create /tmp
-	pause
+	make clean
+	make
+	make makeplist > pkg-plist.new
 	vi pkg-plist.new
-	if ( -e pkg-plist.new ) then
-	    genplist diff
+	printf "Diff:\n"
+	if ( ! { diff -u pkg-plist pkg-plist.new } ) then
 	    printf "Commit? (y/n) "
 	    if ( "$<" == 'y' ) then
-		genplist commit
+		mv -f pkg-plist.new pkg-plist
 	    else
 		exit 0
 	    endif
+	    make clean
+	else
+	    printf "No changes to pkg-plist.\n"
+	    rm -f pkg-plist.new
 	endif
-	genplist test
-	genplist clean
-	printf "Continue? (y/n) "
-	if ( "$<" != 'y' ) exit
     endif
     make reinstall
     if ( $status == 0 ) then
