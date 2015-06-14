@@ -18,7 +18,7 @@ if [ -e $portname/work ]; then
 fi
 mv $portname/distinfo $portname.distinfo
 fgrep -v MD5 $portname.distinfo > $portname/distinfo
-shar `find $portname` > ~bacon/$portname-shar.txt
+shar `find $portname` > $HOME/$portname-shar.txt
 mv -f $portname.distinfo $portname/distinfo
 if [ -e work.$portname ]; then
     mv work.$portname $portname/work
@@ -29,7 +29,7 @@ category=$(basename $(dirname $(pwd)))
 
 cat << EOM
 
-Submit a PR with the file ~bacon/$portname-shar.txt.
+Submit a PR with the file $HOME/$portname-shar.txt.
 
 Summary:    New port: $category/$portname
 	    Maintainer update: $category/$portname
