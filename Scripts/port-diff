@@ -34,7 +34,7 @@ category=$(basename $(dirname $(pwd)))
 
 cat << EOM
 
-Submit a PR with the file $HOME/$portname-shar.txt.
+Submit a PR with the file $HOME/$portname-diff.txt.
 
 Summary:    New port: $category/$portname
 	    Maintainer update: $category/$portname
