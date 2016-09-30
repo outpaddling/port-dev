@@ -41,6 +41,9 @@ fi
 # Determine WRKSRC
 PORTNAME=`awk '$1 == "PORTNAME=" { print $2 }' Makefile`
 PORTVERSION=`awk '$1 == "PORTVERSION=" { print $2 }' Makefile`
+if egrep -q '^GH_TAGNAME=' Makefile; then
+    GH_TAGNAME=`awk '$1 == "GH_TAGNAME=" { print $2 }' Makefile`
+fi
 if egrep -q '^PKGNAMEPREFIX=' Makefile; then
     PKGNAMEPREFIX=`awk '$1 == "PKGNAMEPREFIX=" { print $2 }' Makefile`
     # printf "PKGNAMEPREFIX = %s\n" $PKGNAMEPREFIX
@@ -60,6 +63,7 @@ fi
 WRKSRC=`echo $WRKSRC | sed -e 's|${WRKDIR}|work|g' \
     -e 's|${DISTNAME}|'$DISTNAME'|g' \
     -e 's|${PORTNAME}|'$PORTNAME'|g' \
+    -e 's|${GH_TAGNAME}|'$GH_TAGNAME'|g' \
     -e 's|${PORTVERSION}|'$PORTVERSION'|g'`
 
 # printf "WRKSRC = %s\n" $WRKSRC
@@ -70,7 +74,8 @@ port_dir=`pwd`
 # Go to WRKSRC and generate patch file
 echo $WRKSRC
 cd $WRKSRC
-file=${filename#$WRKSRC/}
+file1=${filename#./$WRKSRC/}
+file=${file1#$WRKSRC/}
 patch_file='patch-'`echo "$file" | sed -e 's|_|__|g' | sed -e 's|/|_|g'`
-diff -uE "$file.orig" "$file" > $port_dir/files/$patch_file
+diff -udp "$file.orig" "$file" > $port_dir/files/$patch_file
 

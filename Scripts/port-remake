@@ -1,31 +1,36 @@
 #!/bin/csh
 
+switch ( $#argv )
+case    0:
+    breaksw
+case    1:
+    echo $1 | fgrep -q /
+    if ( $status == 0 ) then
+	cd /usr/wip/$1
+    else
+	cd /usr/wip/*/$1
+    endif
+    breaksw
+default:
+    printf "Usage: $0 [[category/]dir]\n"
+    exit 1
+endsw
+
 alias pause 'printf "Press return to continue..."; set junk=$<'
 
 switch(`uname`)
 
+# Deinstall as late as possible to minimize uninstalled time
 case    'FreeBSD':
-    make deinstall
-    printf "Remove distfile[s]? (y/n) "
+    printf "Remove distfile[s]? y/[n] "
     if ( "$<" == 'y' ) then
 	make distclean
     else
 	make clean
     endif
     make makesum
-    # fgrep -qi md5 distinfo
-    if ( 0 ) then # $status != 0 ) then
-	# Add md5 sums for older ports trees
-	set distfile=`awk '$1 == "SHA256" { print $2 }' distinfo | tr -d '()'`
-	pushd /usr/ports/distfiles
-	set md5=`md5 $distfile`
-	popd
-	echo "$md5" > distinfo.temp
-	cat distinfo >> distinfo.temp
-	mv -f distinfo.temp distinfo
-    endif
     
-    printf "Regenerate plist? (y/n) "
+    printf "Regenerate plist? y/[n] "
     if ( "$<" == 'y' ) then
 	make clean
 	make
@@ -33,7 +38,7 @@ case    'FreeBSD':
 	vi pkg-plist.new
 	printf "Diff:\n"
 	if ( ! { diff -u pkg-plist pkg-plist.new } ) then
-	    printf "Commit? (y/n) "
+	    printf "Commit? y/[n] "
 	    if ( "$<" == 'y' ) then
 		mv -f pkg-plist.new pkg-plist
 	    else
@@ -45,6 +50,7 @@ case    'FreeBSD':
 	    rm -f pkg-plist.new
 	endif
     endif
+    make deinstall
     make reinstall
     if ( $status == 0 ) then
 	cd ../..

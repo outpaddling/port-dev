@@ -5,7 +5,7 @@ if [ $# != 1 ]; then
     exit 1
 fi
 
-file="$1"
+file="${1#./}"
 if [ ! -e "$file" ]; then
     printf "%s: No such file.\n" "$file"
     exit 1
@@ -17,7 +17,7 @@ fi
 
 vi "$file"
 
-printf 'Regenerate patch file? (y/n) '
+printf 'Regenerate patch file? y/[n] '
 read resp
 if [ 0$resp = 0y ]; then
     port-mkpatch "$file"

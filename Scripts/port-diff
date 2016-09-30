@@ -25,7 +25,7 @@ save_cwd=`pwd`
 if [ -e work ]; then
     mv work ../work.$portname
 fi
-diff -ruN --exclude=CVS --exclude=.svn /usr/ports/$category/$old_portname `pwd` > $HOME/$portname-diff.txt
+diff -ruN --exclude=CVS --exclude=.svn /usr/ports/$category/$old_portname `pwd`
 if [ -e ../work.$portname ]; then
     mv ../work.$portname work
 fi

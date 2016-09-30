@@ -1,6 +1,25 @@
 #!/bin/sh -e
 
-portlint -A
+
+##########################################################################
+#   Function description:
+#       Pause until user presses return
+##########################################################################
+
+pause()
+{
+    local junk
+    
+    printf "Press return to continue..."
+    read junk
+}
+
+make distclean
+portlint -AC
+pause
+make deinstall
+make rmconfig
+make reinstall
 make check-plist
 make stage-qa
-
+make clean

@@ -5,8 +5,8 @@ if [ ! -e pkg-descr ] && ! fgrep MASTERDIR Makefile; then
     exit 1
 fi
 
-portlint -A
 make clean
+portlint=`portlint -A`
 
 portname=$(basename $(pwd))
 #printf "port name = $portname\n"
@@ -26,25 +26,22 @@ fi
 cd $save_cwd
 
 category=$(basename $(dirname $(pwd)))
+comment=`grep ^COMMENT= Makefile | cut -f 2-`
 
 cat << EOM
 
 Submit a PR with the file $HOME/$portname-shar.txt.
 
-Summary:    New port: $category/$portname
-	    Maintainer update: $category/$portname
+Summary:    [NEW PORT] $category/$portname: $comment
+	    [MAINTAINER UPDATE] $category/$portname
 
-Category:   ports
+portlint: OK ($portlint)
+testport: OK (poudriere: versions/archs, options tested)
+unittest: OK (insert test suite summary here if available, or delete this line)
 
-Class:      New port:   change-request
-	    Update:     maintainer update if you're the maintainer
-			change-request if not
-	    
 EOM
 
-printf "uname -a:\n"
-uname -a
-
-printf "\npkg-descr:\n"
+printf "pkg-descr:\n\n"
 cat pkg-descr
+printf '\n'
 

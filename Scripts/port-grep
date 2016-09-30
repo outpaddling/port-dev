@@ -1,12 +1,73 @@
-#!/bin/sh
+#!/bin/sh -e
 
-for dir in /usr/ports /usr/wip; do
-    if [ -d $dir ]; then
-	for category in $dir/*; do
-	    if [ -e $category/Makefile ] && [ $category != /usr/ports/Templates ]; then
-		grep $@ $category/*/Makefile
-	    fi
-	done
+##########################################################################
+#   Script description:
+#       Search files in port frameworks.
+#
+#       This is the same script as pkg-grep in the pkg-dev tools.
+#       Be sure to keep them in sync!
+#
+#   Arguments:
+#       -p prefix (default /usr/ports)
+#       -f file (default Makefile)
+#
+#   History:
+#   Date        Name        Modification
+#   2015-04-20  Jason Bacon Begin
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0 [-p prefix] [-f file] regular-expression [grep flags]\n"
+    exit 1
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ `basename $0` = port-grep ]; then
+    prefix=/usr/ports
+else
+    prefix=/usr/pkgsrc
+fi
+
+# Overwrite later if provided as an argument
+filename='Makefile'
+
+while [ 0`echo $1 | cut -c 1-1` = 0'-' ]; do
+    case "$1" in
+    -p)
+	prefix=$2
+	shift
+	shift
+	;;
+    -f)
+	filename="$2"
+	shift
+	shift
+	;;
+    *)
+	usage
+	;;
+    esac
+done
+
+if [ $# -lt 1 ]; then
+    usage
+fi
+
+re="$1"
+shift
+grep_flags="$@"
+
+set +e
+cd $prefix
+for category in *; do
+    if [ -e $category/Makefile ] && [ $category != Templates ]; then
+	printf "Searching $category...\n"
+	grep $grep_flags "$re" $category/*/$filename
     fi
 done
 
