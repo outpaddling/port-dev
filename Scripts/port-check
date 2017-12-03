@@ -14,7 +14,13 @@ pause()
     read junk
 }
 
-make distclean
+printf "Remove distfile? y/[n] "
+read distclean
+if [ 0$distclean = 0y ]; then
+    make distclean
+else
+    make clean
+fi
 portlint -AC
 pause
 make deinstall

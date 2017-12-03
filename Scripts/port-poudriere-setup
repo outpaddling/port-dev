@@ -13,17 +13,18 @@ conf=$etc/poudriere.conf
 
 if [ ! -e $conf ]; then
     cp $conf.sample $conf
-
-    df
-    printf "ZFS pool? [none] "
-    read zfs
-    if [ 0$zfs != 0 ]; then
-	sed -i '' -e "s|^#ZPOOL.*|ZPOOL=$zfs|" $conf
-    else
-	sed -i '' -e 's|^#NO_ZFS=|NO_ZFS=|' $conf
-    fi
-    $EDITOR $conf
 fi
+
+df
+default_zpool=`awk -F = '$1 == "ZPOOL" { print $2 }' $conf`
+printf "ZFS pool? [$default_zpool] "
+read zfs
+if [ 0$zfs != 0 ]; then
+    sed -i '' -e "s|^#ZPOOL.*|ZPOOL=$zfs|" $conf
+else
+    sed -i '' -e 's|^#NO_ZFS=|NO_ZFS=|' $conf
+fi
+$EDITOR $conf
 
 mirror=`auto-fastest-mirror`
 sed -i '' -e "s|_PROTO_://_CHANGE_THIS_|$mirror|" $conf
@@ -31,9 +32,7 @@ sed -i '' -e "s|^#POUDRIERE_DATA=|POUDRIERE_DATA=|" $conf
 sed -i '' -e "s|^#CCACHE_DIR==|CCACHE_DIR=|" $conf
 
 if [ ! -e /usr/local/poudriere/ports/default ]; then
-    # Install with subversion, not portsnap, to allow modified ports
-    # to persist through updates.
-    poudriere ports -c -m svn+https
+    poudriere ports -c
 fi
 
 another=y

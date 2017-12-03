@@ -5,9 +5,19 @@ if [ ! -e pkg-descr ] && ! fgrep -q MASTERDIR Makefile; then
     exit 1
 fi
 
+if [ 0$PORTSDIR = 0 ]; then
+    PORTSDIR=/usr/ports
+fi
+
 portname=$(basename $(pwd))
-#category=$(awk '$1 == "CATEGORIES=" { print $2 }' Makefile)
-category=$(basename $(dirname $(pwd)))
+category=$(awk '$1 == "CATEGORIES=" { print $3 }' Makefile)
+if [ 0$category = 0 ] || [ ! -e $PORTSDIR/$category ]; then
+    printf "The category of the commited port must be listed second in CATEGORIES.\n"
+    exit 1
+fi
+
+diff_file=/home/$USER/$portname.diff
+
 if [ $# = 1 ]; then
     old_portname=$1
 else
@@ -25,7 +35,16 @@ save_cwd=`pwd`
 if [ -e work ]; then
     mv work ../work.$portname
 fi
-diff -ruN --exclude=CVS --exclude=.svn /usr/ports/$category/$old_portname `pwd`
+if ! diff -ruN --exclude=CVS --exclude=.svn /usr/ports/$category/$old_portname \
+	`pwd` > $diff_file; then
+    # Remove wip from categories
+    sed -i '' -e "s|wip $category|$category|" $diff_file
+    printf "Patch saved in $diff_file.\n"
+else
+    printf "No differences found.\n"
+    rm $diff_file
+    exit 1
+fi
 if [ -e ../work.$portname ]; then
     mv ../work.$portname work
 fi
@@ -34,10 +53,18 @@ category=$(basename $(dirname $(pwd)))
 
 cat << EOM
 
-Submit a PR with the file $HOME/$portname-diff.txt.
+Submit a PR with the file $diff_file.
 
-Summary:    New port: $category/$portname
-	    Maintainer update: $category/$portname
+Summary examples: See porter's guide for details.
+    
+    You are maintainer:
+    
+    [new port] $category/$portname: short description of port
+    [maintainer update] $category/$portname: short description of change
+    
+    You are not maintainer:
+    
+    [change request] $category/$portname: short description of change
 
 Category:   ports
 
@@ -47,13 +74,10 @@ Class:      New port:   change-request
 	    
 EOM
 
-printf "uname -a:\n"
-uname -a
-
 if [ -e pkg-descr ]; then
-    printf "\npkg-descr:\n"
+    printf "\npkg-descr:\n\n"
     cat pkg-descr
 else
-    printf 'No pkg-descr.\n'
+    printf 'WARNING: No pkg-descr.\n'
 fi
-
+printf '\n'

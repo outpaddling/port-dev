@@ -1,89 +1,102 @@
-#!/bin/csh
+#!/bin/sh -e
 
-switch ( $#argv )
-case    0:
-    breaksw
-case    1:
-    echo $1 | fgrep -q /
-    if ( $status == 0 ) then
-	cd /usr/wip/$1
-    else
-	cd /usr/wip/*/$1
-    endif
-    breaksw
-default:
-    printf "Usage: $0 [[category/]dir]\n"
+##########################################################################
+#   Function description:
+#       Pause until user presses return
+##########################################################################
+
+pause()
+{
+    local junk
+    
+    printf "Press return to continue..."
+    read junk
+}
+
+if [ -z $EDITOR ]; then
+    EDITOR=vi
+fi
+
+case $# in
+0)
+    ;;
+
+1)
+    if [ -z $PORTSDIR ]; then
+	PORTSDIR=/usr/ports
+    fi
+    cd $PORTSDIR/wip/$1
+    ;;
+
+*)
+    printf "Usage: $0 [port]\n"
     exit 1
-endsw
+esac
+pwd
 
-alias pause 'printf "Press return to continue..."; set junk=$<'
+printf "Remove distfile[s]? y/[n] "
+read remove
+if [ 0$remove = 0y ]; then
+    make distclean
+else
+    make clean
+fi
+make makesum
 
-switch(`uname`)
-
-# Deinstall as late as possible to minimize uninstalled time
-case    'FreeBSD':
-    printf "Remove distfile[s]? y/[n] "
-    if ( "$<" == 'y' ) then
-	make distclean
-    else
-	make clean
-    endif
-    make makesum
-    
-    printf "Regenerate plist? y/[n] "
-    if ( "$<" == 'y' ) then
-	make clean
-	make
-	make makeplist > pkg-plist.new
-	vi pkg-plist.new
-	printf "Diff:\n"
-	if ( ! { diff -u pkg-plist pkg-plist.new } ) then
-	    printf "Commit? y/[n] "
-	    if ( "$<" == 'y' ) then
-		mv -f pkg-plist.new pkg-plist
-	    else
-		exit 0
-	    endif
-	    make clean
+printf "Regenerate plist? y/[n] "
+read regen
+if [ 0$regen = 0y ]; then
+    make clean stage
+    make makeplist > pkg-plist.new
+    $EDITOR pkg-plist.new
+    printf "Diff:\n"
+    if ! diff -u pkg-plist pkg-plist.new; then
+	printf "Install new plist and test port? y/[n] "
+	read new_plist
+	if [ 0$new_plist = 0y ]; then
+	    mv -f pkg-plist.new pkg-plist
 	else
-	    printf "No changes to pkg-plist.\n"
-	    rm -f pkg-plist.new
-	endif
-    endif
-    make deinstall
-    make reinstall
-    if ( $status == 0 ) then
-	cd ../..
-	printf "Updating repo...\n"
+	    exit 0
+	fi
+	make clean
+    else
+	printf "No changes to pkg-plist.\n"
+	rm -f pkg-plist.new
+    fi
+fi
+
+cat << EOM
+
+=====================
+Running port-check...
+=====================
+
+EOM
+port-check
+
+printf "Commit changes to port? y/[n] "
+read commit
+if [ 0$commit = 0y ]; then
+    printf "Updating repo...\n"
+    if [ -e ../.svn ]; then
 	svn up
-	printf "Comitting changes...\n"
-	svn ci -m 'Auto-updated by remake'
-    endif
-    breaksw
+    elif [ -e ../.git ]; then
+	git pull
+    else
+	printf "This is neither a subversion nor a git repository.\n"
+	exit 1
+    fi
+    printf "Comitting changes...\n"
+    if [ -e ../.svn ]; then
+	svn ci
+    elif [ -e ../.git ]; then
+	git commit -a
+	git push
+    fi
+fi
 
-case    'Darwin':
-    port -f uninstall
-    port clean --all
-    
-    # Remove checksum(s) from Portfile
-    # Find "checksums" in field 1, and remove all lines ending with '\'.
-    awk ' { if ( $1 == "checksums" ) { while ( $NF == "\\" ) getline; } else { print $0 }}' Portfile >! temp
-    /bin/mv -f Portfile Portfile.bak
-    /bin/mv temp Portfile
-    sleep 2     # port complains that Portfile is from future
-    
-    # Append new checksums to Portfile
-    # Find "checksums" in field 1, then print all lines ending with '\'
-    # and the one after.
-    port -d checksum | & awk ' { if ( $1 == "checksums" ) { while ( $NF == "\\" ) { print $0; getline; } print $0; } }' >> Portfile
-    sleep 2     # port complains that Portfile is from future
-    
-    port install
-    if ( $status == 0 ) then
-	cd ../../..
-	./update-web-tree
-	update-jb-ports
-    endif
-    breaksw
-endsw
-
+printf "Deinstall? y/[n] "
+read deinstall
+if [ 0$deinstall = 0y ]; then
+    make deinstall
+fi
