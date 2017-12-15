@@ -4,12 +4,13 @@
 #   Script description:
 #       Search files in port frameworks.
 #
-#       This is the same script as pkg-grep in the pkg-dev tools.
-#       Be sure to keep them in sync!
+#   Note:
+#       Keep in sync with pkg-grep!
 #
 #   Arguments:
 #       -p prefix (default /usr/ports)
 #       -f file (default Makefile)
+#       -v (echo categories during search)
 #
 #   History:
 #   Date        Name        Modification
@@ -18,7 +19,7 @@
 
 usage()
 {
-    printf "Usage: $0 [-p prefix] [-f file] regular-expression [grep flags]\n"
+    printf "Usage: $0 [-p prefix] [-f file] [-v] regular-expression [grep flags]\n"
     exit 1
 }
 
