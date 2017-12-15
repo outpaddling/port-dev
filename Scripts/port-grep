@@ -48,6 +48,10 @@ while [ 0`echo $1 | cut -c 1-1` = 0'-' ]; do
 	shift
 	shift
 	;;
+    -v)
+	verbose=1
+	shift
+	;;
     *)
 	usage
 	;;
@@ -66,7 +70,9 @@ set +e
 cd $prefix
 for category in *; do
     if [ -e $category/Makefile ] && [ $category != Templates ]; then
-	printf "Searching $category...\n"
+	if [ 0$verbose = 01 ]; then
+	    printf "Searching $category...\n"
+	fi
 	grep $grep_flags "$re" $category/*/$filename
     fi
 done
