@@ -28,6 +28,7 @@ if [ $# != 1 ]; then
 fi
 
 filename="$1"
+
 if [ ! -e pkg-descr ]; then
     printf "$0 must be run from the port directory.\n"
     exit 1
@@ -57,15 +58,13 @@ fi
 DISTNAME=`awk '$1 == "DISTNAME=" { print $2 }' Makefile | \
     sed -e 's|${PKGNAMEPREFIX}|'$PKGNAMEPREFIX'|g'`
 
+port_dir=`pwd`
+# If WRKSRC is not set, assume first two components of pathname
 if egrep -q '^WRKSRC=' Makefile; then
     WRKSRC=`awk '$1 == "WRKSRC=" { print $2 }' Makefile`
-    # printf "Raw WRKSRC = %s\n" $WRKSRC
-elif egrep -q '^DISTNAME=' Makefile; then
-    WRKSRC=work/`awk '$1 == "DISTNAME=" { print $2 }' Makefile`
-elif [ 0$GH_PROJECT != 0 ]; then
-    WRKSRC=work/${GH_PROJECT}-${PORTVERSION}
 else
-    WRKSRC=work/${PORTNAME}-${PORTVERSION}
+    relfile=${filename##$port_dir/}
+    WRKSRC=`echo $relfile | awk -F / '{ printf("%s/%s",$1,$2) }'`
 fi
 # Do DISTNAME before PORTNAME and PORTVERSION in case it references them.
 WRKSRC=`echo $WRKSRC | sed -e 's|${WRKDIR}|work|g' \
@@ -75,15 +74,12 @@ WRKSRC=`echo $WRKSRC | sed -e 's|${WRKDIR}|work|g' \
     -e 's|${GH_PROJECT}|'$GH_PROJECT'|g' \
     -e 's|${PORTVERSION}|'$PORTVERSION'|g'`
 
-# printf "WRKSRC = %s\n" $WRKSRC
-
 mkdir -p files
-port_dir=`pwd`
 
 # Go to WRKSRC and generate patch file
-echo $WRKSRC
 cd $WRKSRC
 file1=${filename#./$WRKSRC/}
 file=${file1#$WRKSRC/}
 patch_file='patch-'`echo "$file" | sed -e 's|_|__|g' | sed -e 's|/|_|g'`
+printf "Writing files/$patch_file.\n"
 diff -udp "$file.orig" "$file" > $port_dir/files/$patch_file
