@@ -41,6 +41,9 @@ fi
 # Determine WRKSRC
 PORTNAME=`awk '$1 == "PORTNAME=" { print $2 }' Makefile`
 PORTVERSION=`awk '$1 == "PORTVERSION=" { print $2 }' Makefile`
+if [ 0$PORTVERSION = 0 ]; then
+    PORTVERSION=`awk '$1 == "DISTVERSION=" { print $2 }' Makefile`
+fi
 if egrep -q '^GH_TAGNAME=' Makefile; then
     GH_TAGNAME=`awk '$1 == "GH_TAGNAME=" { print $2 }' Makefile`
 fi
@@ -59,6 +62,8 @@ if egrep -q '^WRKSRC=' Makefile; then
     # printf "Raw WRKSRC = %s\n" $WRKSRC
 elif egrep -q '^DISTNAME=' Makefile; then
     WRKSRC=work/`awk '$1 == "DISTNAME=" { print $2 }' Makefile`
+elif [ 0$GH_PROJECT != 0 ]; then
+    WRKSRC=work/${GH_PROJECT}-${PORTVERSION}
 else
     WRKSRC=work/${PORTNAME}-${PORTVERSION}
 fi
