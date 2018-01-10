@@ -35,14 +35,23 @@ save_cwd=`pwd`
 if [ -e work ]; then
     mv work ../work.$portname
 fi
+if grep -q '^CATEGORIES.*wip' Makefile; then
+    wip=1
+    sed -i '' -e "s|wip $category|$category|" Makefile
+fi
 if ! diff -ruN --exclude=CVS --exclude=.svn /usr/ports/$category/$old_portname \
 	`pwd` > $diff_file; then
     # Remove wip from categories
-    sed -i '' -e "s|wip $category|$category|" $diff_file
     printf "Patch saved in $diff_file.\n"
+    if [ 0$wip = 01 ]; then
+	sed -i '' -e "s|$category|wip $category|" Makefile
+    fi
 else
     printf "No differences found.\n"
     rm $diff_file
+    if [ 0$wip = 01 ]; then
+	sed -i '' -e "s|$category|wip $category|" Makefile
+    fi
     exit 1
 fi
 if [ -e ../work.$portname ]; then

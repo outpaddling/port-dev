@@ -4,6 +4,9 @@ if [ -z $EDITOR ]; then
     export EDITOR=vi
 fi
 
+# Avoid perm issues as poudriere runs as nobody
+umask 022
+
 if ! which poudriere > /dev/null; then
     pkg install poudriere
 fi
