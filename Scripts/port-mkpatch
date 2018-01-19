@@ -82,4 +82,6 @@ file1=${filename#./$WRKSRC/}
 file=${file1#$WRKSRC/}
 patch_file='patch-'`echo "$file" | sed -e 's|_|__|g' | sed -e 's|/|_|g'`
 printf "Writing files/$patch_file.\n"
-diff -udp "$file.orig" "$file" > $port_dir/files/$patch_file
+diff -udp "$file.orig" "$file" > $port_dir/files/$patch_file || true
+cd $port_dir
+make makepatch
