@@ -40,6 +40,8 @@ if [ ! -e "$filename.orig" ]; then
 fi
 
 # Determine WRKSRC
+# FIXME: Use auto-print-make-variable
+
 PORTNAME=`awk '$1 == "PORTNAME=" { print $2 }' Makefile`
 PORTVERSION=`awk '$1 == "PORTVERSION=" { print $2 }' Makefile`
 if [ 0$PORTVERSION = 0 ]; then
