@@ -41,6 +41,7 @@ if [ 0$remove = 0y ]; then
 else
     make clean
 fi
+rm -f distinfo
 make makesum
 
 printf "Regenerate plist? y/[n] "

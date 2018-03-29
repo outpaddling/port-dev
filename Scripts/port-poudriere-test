@@ -61,19 +61,20 @@ if [ $# -lt 2 ]; then
     usage
 fi
 
+args=$#
 port=$1
 shift
 jails="$@"
 umask 022
 
-if [ $jails = all ]; then
+if [ "$jails" = all ]; then
     jails="`poudriere jail -l | awk '$0 !~ "JAILNAME" { print $1 }'`"
 else
-    if [ $# = 2 ]; then
+    if [ $args = 2 ]; then
 	# Only one jail arg, match all jails contining the pattern
 	# E.g. i386 or 10-3
 	jails="`poudriere jail -l | \
-	    awk -v pattern=$jails '$1 ~ pattern { print $1 }'`"
+	    awk -v pattern="$jails" '$1 ~ pattern { print $1 }'`"
     else
 	# Enumerated all jails explicitly
 	jails="$@"
