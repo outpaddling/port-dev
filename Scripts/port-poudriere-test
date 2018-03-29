@@ -62,7 +62,8 @@ if [ $# -lt 2 ]; then
 fi
 
 port=$1
-jails=$2
+shift
+jails="$@"
 umask 022
 
 if [ $jails = all ]; then
