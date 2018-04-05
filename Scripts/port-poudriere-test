@@ -94,7 +94,7 @@ for jailname in $jails; do
     fi
     stty intr ^C
     pkgname=$(auto-print-make-variable $port PKGNAME)
-    logfile=$(awk '$2 == "Logs:" || $3 == "Logs:" { print $NF }' output)"/logs/$pkgname.log"
+    logfile=$(awk '$2 == "Logs:" || $3 == "Logs:" { print $NF }' output | uniq)"/logs/$pkgname.log"
     cp $logfile $(basename $logfile)"-$jailname"
     rm -f output
     printf "End of build on $jailname.\n"
