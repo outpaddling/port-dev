@@ -37,7 +37,7 @@ if [ -e work ]; then
 fi
 if grep -q '^CATEGORIES.*wip' Makefile; then
     wip=1
-    sed -i .bak -e "s|wip $category|$category|" Makefile
+    sed -i .bak -e "/^CATEGORIES/s|wip ||" Makefile
     mv Makefile.bak /tmp/Makefile.bak.$portname
 fi
 if ! diff -ruN --exclude=CVS --exclude=.svn /usr/ports/$category/$old_portname \

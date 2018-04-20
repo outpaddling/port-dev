@@ -41,8 +41,12 @@ if [ 0$remove = 0y ]; then
 else
     make clean
 fi
-rm -f distinfo
-make makesum
+
+# Check for metaports
+if fgrep -q MASTER_SITES Makefile; then
+    rm -f distinfo
+    make makesum
+fi
 
 printf "Regenerate plist? y/[n] "
 read regen
