@@ -42,16 +42,15 @@ if grep -q '^CATEGORIES.*wip' Makefile; then
 fi
 if ! diff -ruN --exclude=CVS --exclude=.svn /usr/ports/$category/$old_portname \
 	`pwd` > $diff_file; then
-    # Remove wip from categories
-    printf "Patch saved in $diff_file.\n"
     if [ 0$wip = 01 ]; then
 	mv /tmp/Makefile.bak.$portname Makefile
     fi
+    printf "Patch saved in $diff_file.\n"
 else
     printf "No differences found.\n"
     rm $diff_file
     if [ 0$wip = 01 ]; then
-	sed -i '' -e "s|$category|wip $category|" Makefile
+	mv /tmp/Makefile.bak.$portname Makefile
     fi
     exit 1
 fi
