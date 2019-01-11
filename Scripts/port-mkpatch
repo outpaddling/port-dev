@@ -2,14 +2,11 @@
 
 ##########################################################################
 #   Script description:
-#       
-#   Arguments:
-#       
-#   Returns:
+#       Generate a patch file and store in files dir with canonical name
 #       
 #   History:
 #   Date        Name        Modification
-#   2014-11-10  Charlie &   Begin
+#   2014-11-10  J Bacon     Begin
 ##########################################################################
 
 usage()
@@ -40,31 +37,10 @@ if [ ! -e "$filename.orig" ]; then
 fi
 
 # Determine WRKSRC
-# FIXME: Use auto-print-make-variable
-
-PORTNAME=`awk '$1 == "PORTNAME=" { print $2 }' Makefile`
-PORTVERSION=`awk '$1 == "PORTVERSION=" { print $2 }' Makefile`
-if [ 0$PORTVERSION = 0 ]; then
-    PORTVERSION=`awk '$1 == "DISTVERSION=" { print $2 }' Makefile`
-fi
-if egrep -q '^GH_TAGNAME=' Makefile; then
-    GH_TAGNAME=`awk '$1 == "GH_TAGNAME=" { print $2 }' Makefile`
-fi
-if egrep -q '^GH_PROJECT=' Makefile; then
-    GH_PROJECT=`awk '$1 == "GH_PROJECT=" { print $2 }' Makefile`
-fi
-if egrep -q '^PKGNAMEPREFIX=' Makefile; then
-    PKGNAMEPREFIX=`awk '$1 == "PKGNAMEPREFIX=" { print $2 }' Makefile`
-    # printf "PKGNAMEPREFIX = %s\n" $PKGNAMEPREFIX
-fi
-DISTNAME=`awk '$1 == "DISTNAME=" { print $2 }' Makefile | \
-    sed -e 's|${PKGNAMEPREFIX}|'$PKGNAMEPREFIX'|g'`
-
 port_dir=`pwd`
 # If WRKSRC is not set, assume first two components of pathname
 grandparent=${port_dir%/*/*}
 port=${port_dir#$grandparent/}
-echo $grandparent $port
 WRKSRC=`auto-print-make-variable -p $grandparent $port WRKSRC`
 # Get relative path
 WRKSRC=${WRKSRC#$port_dir/}
