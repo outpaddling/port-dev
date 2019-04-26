@@ -37,8 +37,7 @@ make rmconfig
 make reinstall
 make check-plist
 make stage-qa
-printf "Clean? y/[n] "
-read clean
-if [ 0$clean != 0y ]; then
+read -p "Clean? y/[n] " clean
+if [ 0$clean = 0y ]; then
     make clean
 fi
