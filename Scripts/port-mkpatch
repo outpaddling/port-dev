@@ -53,6 +53,10 @@ file1=${filename#./$WRKSRC/}
 file=${file1#$WRKSRC/}
 patch_file='patch-'`echo "$file" | sed -e 's|_|__|g' | sed -e 's|/|_|g'`
 printf "Writing files/$patch_file.\n"
-diff -udp "$file.orig" "$file" > $port_dir/files/$patch_file || true
+# Match diff command to Mk/Scripts/smart_makepatch.sh
+# to avoid need to run make makepatch
+TZ=UTC diff -udp "$file.orig" "$file" | sed \
+			-e '/^---/s|\.[0-9]* +0000$| UTC|' \
+			-e '/^+++/s|\([[:blank:]][-0-9:.+]*\)*$||' \
+			> $port_dir/files/$patch_file || true
 cd $port_dir
-make makepatch
