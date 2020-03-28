@@ -34,6 +34,7 @@ sed -i '' -e "s|_PROTO_://_CHANGE_THIS_|$mirror|" $conf
 sed -i '' -e "s|^#POUDRIERE_DATA=|POUDRIERE_DATA=|" $conf
 sed -i '' -e "s|^#CCACHE_DIR==|CCACHE_DIR=|" $conf
 
+mkdir -p /usr/local/poudriere/data
 if [ ! -e /usr/local/poudriere/ports/default ]; then
     poudriere ports -c
 fi
