@@ -81,15 +81,16 @@ fi
 
 for jailname in $jails; do
     printf "Starting build on $jailname...\n"
+    terminal_output=buildlog-$jailname-$(echo $port | sed -e 's|/|-|g')
     stty intr undef
-    if ! poudriere testport -j $jailname -o $port 2>&1 | tee output-$jailname; then
+    if ! poudriere testport -j $jailname -o $port 2>&1 | tee $terminal_output; then
 	stty intr ^C
 	exit 1
     fi
     stty intr ^C
     pkgname=$(auto-print-make-variable $port PKGNAME)
-    logfile=$(awk '$2 == "Logs:" || $3 == "Logs:" { print $NF }' output-$jailname | uniq)"/logs/$pkgname.log"
+    logfile=$(awk '$2 == "Logs:" || $3 == "Logs:" { print $NF }' $terminal_output | uniq)"/logs/$pkgname.log"
     cp $logfile $(basename $logfile)"-$jailname"
-    rm -f output-$jailname
+    rm -f $terminal_output
     printf "End of build on $jailname.\n"
 done
