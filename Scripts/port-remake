@@ -1,0 +1,107 @@
+#!/bin/sh -e
+
+##########################################################################
+#   Function description:
+#       Pause until user presses return
+##########################################################################
+
+pause()
+{
+    local junk
+    
+    printf "Press return to continue..."
+    read junk
+}
+
+if [ -z $EDITOR ]; then
+    EDITOR=vi
+fi
+
+case $# in
+0)
+    ;;
+
+1)
+    if [ -z $PORTSDIR ]; then
+	PORTSDIR=/usr/ports
+    fi
+    cd $PORTSDIR/wip/$1
+    ;;
+
+*)
+    printf "Usage: $0 [port]\n"
+    exit 1
+esac
+pwd
+
+printf "Remove distfile[s]? y/[n] "
+read remove
+if [ 0$remove = 0y ]; then
+    make distclean
+else
+    make clean
+fi
+
+# Check for metaports
+if fgrep -q MASTER_SITES Makefile || fgrep -q USE_GITHUB Makefile; then
+    rm -f distinfo
+    make makesum
+fi
+
+printf "Regenerate plist? y/[n] "
+read regen
+if [ 0$regen = 0y ]; then
+    make clean stage
+    make makeplist > pkg-plist.new
+    $EDITOR pkg-plist.new
+    printf "Diff:\n"
+    if ! diff -u pkg-plist pkg-plist.new; then
+	printf "Install new plist and test port? y/[n] "
+	read new_plist
+	if [ 0$new_plist = 0y ]; then
+	    mv -f pkg-plist.new pkg-plist
+	else
+	    exit 0
+	fi
+	make clean
+    else
+	printf "No changes to pkg-plist.\n"
+	rm -f pkg-plist.new
+    fi
+fi
+
+cat << EOM
+
+=====================
+Running port-check...
+=====================
+
+EOM
+port-check
+
+printf "Commit changes to port? y/[n] "
+read commit
+if [ 0$commit = 0y ]; then
+    printf "Updating repo...\n"
+    if [ -e ../.svn ]; then
+	svn up
+    elif [ -e ../.git ]; then
+	git pull
+    else
+	printf "This is neither a subversion nor a git repository.\n"
+	exit 1
+    fi
+    printf "Comitting changes...\n"
+    if [ -e ../.svn ]; then
+	svn ci
+    elif [ -e ../.git ]; then
+	git commit -a
+	git push
+    fi
+fi
+
+printf "Deinstall? y/[n] "
+read deinstall
+if [ 0$deinstall = 0y ]; then
+    make deinstall
+fi

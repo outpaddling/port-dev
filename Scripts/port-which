@@ -1,0 +1,34 @@
+#!/bin/csh
+
+if ( $#argv > 2 ) then
+endif
+
+cd /usr/ports
+switch($#argv)
+case    2:
+    set dirs = $1
+    set filename = $2
+    breaksw
+case    1:
+    set dirs = [a-z]*
+    set filename = $1
+    breaksw
+default:
+    echo "Usage: $0 [category] <filename>"
+    exit 1
+endsw
+
+foreach dir ($dirs)
+    if ( -d $dir && ($dir != "distfiles") && ($dir != "packages") ) then
+	echo "Searching $dir..."
+	cd $dir
+	foreach plist (*/pkg-plist)
+	    grep -wl ${filename}$ $plist
+	    if ( $status == 0 ) then
+		grep ${filename}$ $plist
+	    endif
+	end
+	cd ..
+    endif
+end
+

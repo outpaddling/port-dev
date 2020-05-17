@@ -1,0 +1,62 @@
+#!/bin/sh -e
+
+##########################################################################
+#   Script description:
+#       Generate a patch file and store in files dir with canonical name
+#       
+#   History:
+#   Date        Name        Modification
+#   2014-11-10  J Bacon     Begin
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0 filename\n"
+    exit 1
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 1 ]; then
+    usage
+fi
+
+filename="$1"
+
+if [ ! -e pkg-descr ]; then
+    printf "$0 must be run from the port directory.\n"
+    exit 1
+fi
+
+if [ ! -e "$filename.orig" ]; then
+    printf "Error: No $filename.orig present.\n"
+    exit 1
+fi
+
+# Determine WRKSRC
+port_dir=`pwd`
+# If WRKSRC is not set, assume first two components of pathname
+grandparent=${port_dir%/*/*}
+port=${port_dir#$grandparent/}
+WRKSRC=`auto-print-make-variable -p $grandparent $port WRKSRC`
+# Get relative path
+WRKSRC=${WRKSRC#$port_dir/}
+
+mkdir -p files
+
+# Go to WRKSRC and generate patch file
+cd $WRKSRC
+file1=${filename#./$WRKSRC/}
+file=${file1#$WRKSRC/}
+patch_file='patch-'`echo "$file" | sed -e 's|_|__|g' | sed -e 's|/|_|g'`
+printf "Writing files/$patch_file.\n"
+# Match diff command to Mk/Scripts/smart_makepatch.sh
+# to avoid need to run make makepatch
+TZ=UTC diff -udp "$file.orig" "$file" | sed \
+			-e '/^---/s|\.[0-9]* +0000$| UTC|' \
+			-e '/^+++/s|\([[:blank:]][-0-9:.+]*\)*$||' \
+			> $port_dir/files/$patch_file || true
+cd $port_dir

@@ -1,0 +1,46 @@
+#!/bin/sh -e
+
+##########################################################################
+#   Script description:
+#       
+#   Arguments:
+#       
+#   Returns:
+#       
+#   History:
+#   Date        Name        Modification
+#   2015-11-09  Charlie &   Begin
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0 directory wrksrc-suffix\n"
+    exit 1
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 2 ]; then
+    usage
+fi
+
+dir="$1"
+suffix="$2"
+programs=$(basename `file -F ' ' work/vcflib-2015.11.08/bin/* | awk '$2 == "ELF" { print $1 }'`)
+scripts=$(basename `file -F ' ' work/vcflib-2015.11.08/bin/* | awk '$0 ~ "script" { print $1 }'`)
+
+printf '\t${INSTALL_PROGRAM} \\\n'
+for prog in $programs; do
+    printf "\t\t\${WRKSRC}/$suffix/$prog \\\\\n"
+done
+printf '\t\t${STAGEDIR}${PREFIX}/bin\n'
+
+printf '\t${INSTALL_SCRIPT} \\\n'
+for prog in $scripts; do
+    printf "\t\t\${WRKSRC}/$suffix/$prog \\\\\n"
+done
+printf '\t\t${STAGEDIR}${PREFIX}/bin\n'
+

@@ -1,0 +1,17 @@
+#!/bin/sh -e
+
+cat << EOM
+
+Note: Jails cannot be newer than the host system.
+
+If your host system is not fully up-to-date, run auto-update-system first.
+
+EOM
+read -p "Is your host system up-to-date? y/[n] " up2date
+if [ 0$up2date = 0y ]; then
+    for jail in `poudriere jail -ql | awk '{ print $1 }'`; do
+	printf "$jail\n"
+	poudriere jail -u -j $jail
+    done
+    poudriere ports -u
+fi

@@ -1,0 +1,92 @@
+#!/bin/sh -e
+
+if [ ! -e pkg-descr ] && ! fgrep -q MASTERDIR Makefile; then
+    printf "You must run this script from within port directory.\n"
+    exit 1
+fi
+
+if [ 0$PORTSDIR = 0 ]; then
+    PORTSDIR=/usr/ports
+fi
+
+portname=$(basename $(pwd))
+category=$(awk '$1 == "CATEGORIES=" { print $3 }' Makefile)
+if [ 0$category = 0 ] || [ ! -e $PORTSDIR/$category ]; then
+    printf "The category of the commited port must be listed second in CATEGORIES.\n"
+    exit 1
+fi
+
+diff_file=/home/$USER/$portname.diff
+
+if [ $# = 1 ]; then
+    old_portname=$1
+else
+    old_portname=$portname
+fi
+#printf "port name = $portname\n"
+#printf "category = $category\n"
+
+if [ ! -e /usr/ports/$category/$old_portname ]; then
+    printf "Error: /usr/ports/$category/$old_portname does not exist.\n"
+    exit 1
+fi
+
+save_cwd=`pwd`
+if [ -e work ]; then
+    mv work ../work.$portname
+fi
+if grep -q '^CATEGORIES.*wip' Makefile; then
+    wip=1
+    sed -i .bak -e "/^CATEGORIES/s|wip ||" Makefile
+    mv Makefile.bak /tmp/Makefile.bak.$portname
+fi
+if ! diff -ruN --exclude=CVS --exclude=.svn /usr/ports/$category/$old_portname \
+	`pwd` > $diff_file; then
+    if [ 0$wip = 01 ]; then
+	mv /tmp/Makefile.bak.$portname Makefile
+    fi
+    printf "Patch saved in $diff_file.\n"
+else
+    printf "No differences found.\n"
+    rm $diff_file
+    if [ 0$wip = 01 ]; then
+	mv /tmp/Makefile.bak.$portname Makefile
+    fi
+    exit 1
+fi
+if [ -e ../work.$portname ]; then
+    mv ../work.$portname work
+fi
+
+category=$(basename $(dirname $(pwd)))
+
+cat << EOM
+
+Submit a PR with the file $diff_file.
+
+Summary examples: See porter's guide for details.
+    
+    You are maintainer:
+    
+    [new port] $category/$portname: short description of port
+    [maintainer update] $category/$portname: short description of change
+    
+    You are not maintainer:
+    
+    [change request] $category/$portname: short description of change
+
+Category:   ports
+
+Class:      New port:   change-request
+	    Update:     maintainer update if you're the maintainer
+			change-request if not
+	    
+EOM
+
+if [ -e pkg-descr ]; then
+    printf "\npkg-descr:\n\n"
+    cat pkg-descr
+else
+    printf 'WARNING: No pkg-descr.\n'
+fi
+printf '\n'

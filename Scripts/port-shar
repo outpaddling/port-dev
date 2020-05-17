@@ -1,0 +1,47 @@
+#!/bin/sh -e
+
+if [ ! -e pkg-descr ] && ! fgrep MASTERDIR Makefile; then
+    printf "You must run this script from within port directory.\n"
+    exit 1
+fi
+
+make clean
+portlint=`portlint -A`
+
+portname=$(basename $(pwd))
+#printf "port name = $portname\n"
+
+save_cwd=`pwd`
+cd ..
+if [ -e $portname/work ]; then
+    mv $portname/work work.$portname
+fi
+mv $portname/distinfo $portname.distinfo
+fgrep -v MD5 $portname.distinfo > $portname/distinfo
+shar `find $portname` > $HOME/$portname-shar.txt
+mv -f $portname.distinfo $portname/distinfo
+if [ -e work.$portname ]; then
+    mv work.$portname $portname/work
+fi
+cd $save_cwd
+
+category=$(basename $(dirname $(pwd)))
+comment=`grep ^COMMENT= Makefile | cut -f 2-`
+
+cat << EOM
+
+Submit a PR with the file $HOME/$portname-shar.txt.
+
+Summary:    [NEW PORT] $category/$portname: $comment
+	    [MAINTAINER UPDATE] $category/$portname
+
+portlint: OK ($portlint)
+testport: OK (poudriere: versions/archs, options tested)
+unittest: OK (insert test suite summary here if available, or delete this line)
+
+EOM
+
+printf "pkg-descr:\n\n"
+cat pkg-descr
+printf '\n'
+

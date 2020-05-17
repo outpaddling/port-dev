@@ -1,0 +1,96 @@
+#!/bin/sh -e
+
+##########################################################################
+#   Script description:
+#       Run poudriere testport under one or more jails
+#       
+#   History:
+#   Date        Name        Modification
+#   2016-02-02  J Bacon     Begin
+##########################################################################
+
+usage()
+{
+    cat << EOM
+
+Usage: $0 category/port all|pattern|jailname [pattern|jailname ...]
+
+Examples:
+
+    # All jails
+    port-poudriere-test devel/boost-libs all
+
+    # All jails with 10-3 in name
+    port-poudriere-test devel/boost-libs 10-3
+
+    # All jails with amd64 in name
+    port-poudriere-test devel/boost-libs amd64
+
+    # Two specific jails
+    port-poudriere-test devel/boost-libs 10-3-amd64 11-0-i386
+
+EOM
+    printf "Available jails:\n\n"
+    poudriere jail -ln
+    exit 1
+}
+
+
+##########################################################################
+#   Function description:
+#       Pause until user presses return
+##########################################################################
+
+pause()
+{
+    local junk
+    
+    printf "Press return to continue..."
+    read junk
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# -lt 2 ]; then
+    usage
+fi
+
+args=$#
+port=$1
+shift
+jails="$@"
+umask 022
+
+if [ "$jails" = all ]; then
+    jails="`poudriere jail -l | awk '$0 !~ "JAILNAME" { print $1 }'`"
+else
+    jails=""
+    for pattern in "$@"; do
+	# Match all jails contining the pattern, e.g. i386 or 10-3
+	jails="$jails `poudriere jail -l | \
+	    awk -v pattern="$pattern" '$1 ~ pattern { print $1 }'`"
+    done
+fi
+
+if [ -z $PORTSDIR ]; then
+    PORTSDIR=/usr/ports
+fi
+
+for jailname in $jails; do
+    printf "Starting build on $jailname...\n"
+    terminal_output=buildlog-$jailname-$(echo $port | sed -e 's|/|-|g')
+    stty intr undef
+    if ! poudriere testport -j $jailname -o $port 2>&1 | tee $terminal_output; then
+	stty intr ^C
+	exit 1
+    fi
+    stty intr ^C
+    pkgname=$(auto-print-make-variable $port PKGNAME)
+    logfile=$(awk '$2 == "Logs:" || $3 == "Logs:" { print $NF }' $terminal_output | uniq)"/logs/$pkgname.log"
+    cp $logfile $(basename $logfile)"-$jailname"
+    rm -f $terminal_output
+    printf "End of build on $jailname.\n"
+done

@@ -1,0 +1,43 @@
+#!/bin/sh -e
+
+
+##########################################################################
+#   Function description:
+#       Pause until user presses return
+##########################################################################
+
+pause()
+{
+    local junk
+    
+    printf "Press return to continue..."
+    read junk
+}
+
+if ! grep -q '^DEVELOPER' /etc/make.conf; then
+    printf "DEVELOPER=yes not set in /etc/make.conf.  Stage-qa checks will not be performed.\n"
+    printf "Continue? y/[n] "
+    read continue
+    if [ 0$continue != 0y ]; then
+	exit
+    fi
+fi
+
+printf "Remove distfile? y/[n] "
+read distclean
+if [ 0$distclean = 0y ]; then
+    make distclean
+else
+    make clean
+fi
+portlint -AC
+pause
+make deinstall
+make rmconfig
+make reinstall
+make check-plist
+make stage-qa
+read -p "Clean? y/[n] " clean
+if [ 0$clean = 0y ]; then
+    make clean
+fi

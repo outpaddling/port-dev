@@ -1,0 +1,96 @@
+#!/bin/sh -e
+
+if [ -z $EDITOR ]; then
+    export EDITOR=vi
+fi
+
+# Avoid perm issues as poudriere runs as nobody
+umask 022
+
+if ! which poudriere > /dev/null; then
+    pkg install poudriere
+fi
+
+etc=/usr/local/etc
+conf=$etc/poudriere.conf
+
+if [ ! -e $conf ]; then
+    cp $conf.sample $conf
+fi
+
+df
+default_zpool=`awk -F = '$1 == "ZPOOL" { print $2 }' $conf`
+printf "ZFS pool? [$default_zpool] "
+read zfs
+if [ 0$zfs != 0 ]; then
+    sed -i '' -e "s|^#ZPOOL.*|ZPOOL=$zfs|" $conf
+else
+    sed -i '' -e 's|^#NO_ZFS=|NO_ZFS=|' $conf
+fi
+$EDITOR $conf
+
+mirror=`auto-fastest-mirror`
+sed -i '' -e "s|_PROTO_://_CHANGE_THIS_|$mirror|" $conf
+sed -i '' -e "s|^#POUDRIERE_DATA=|POUDRIERE_DATA=|" $conf
+sed -i '' -e "s|^#CCACHE_DIR==|CCACHE_DIR=|" $conf
+
+mkdir -p /usr/local/poudriere/data
+if [ ! -e /usr/local/poudriere/ports/default ]; then
+    poudriere ports -c
+fi
+
+another=y
+while [ 0$another = 0y ]; do
+    printf "Existing poudriere jails:\n\n"
+    poudriere jail -l
+
+    cat << EOM
+
+On amd64 systems, you can create either amd64 or i386 jails.
+
+For other architectures, accept the default below.
+
+EOM
+    default_arch=`uname -p`
+    printf "Processor architecture? [$default_arch] "
+    read arch
+    if [ 0$arch = 0 ]; then
+	arch=$default_arch
+    fi
+
+    cat << EOM
+
+You can select any release equal to or older than the default shown below.
+
+EOM
+    
+    default_release=`uname -r`
+    default_release=${default_release%-p*}
+    printf "Release? [$default_release] "
+    read release
+    if [ 0$release = 0 ]; then
+	release=$default_release
+    fi
+    
+    default_name=`echo $release | cut -d - -f 1 | tr '.' '-'`-$arch
+    printf "Jail name? [$default_name] "
+    read name
+    if [ 0$name = 0 ]; then
+	name=$default_name
+    fi
+    
+    poudriere jail -c -j "$name" -v $release -a $arch || true
+    
+    if [ $arch = amd64 ]; then
+	name=`echo $release | cut -d - -f 1 | tr '.' '-'`-i386
+	printf "Create $name as well? [y]/n "
+	read i386
+	if [ 0$i386 != 0n ]; then
+	    poudriere jail -c -j "$name" -v $release -a i386 || true
+	fi
+    fi
+    
+    printf "Create another jail for an older release? y/[n] "
+    read another
+done
+
