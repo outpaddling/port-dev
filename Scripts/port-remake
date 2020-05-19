@@ -48,6 +48,8 @@ if fgrep -q MASTER_SITES Makefile || fgrep -q USE_GITHUB Makefile; then
     make makesum
 fi
 
+env BATCH=1 make depends
+
 printf "Regenerate plist? y/[n] "
 read regen
 if [ 0$regen = 0y ]; then
