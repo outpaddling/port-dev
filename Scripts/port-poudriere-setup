@@ -13,6 +13,7 @@ fi
 
 etc=/usr/local/etc
 conf=$etc/poudriere.conf
+poudriere=/usr/local/poudriere
 
 if [ ! -e $conf ]; then
     cp $conf.sample $conf
@@ -34,9 +35,17 @@ sed -i '' -e "s|_PROTO_://_CHANGE_THIS_|$mirror|" $conf
 sed -i '' -e "s|^#POUDRIERE_DATA=|POUDRIERE_DATA=|" $conf
 sed -i '' -e "s|^#CCACHE_DIR==|CCACHE_DIR=|" $conf
 
-mkdir -p /usr/local/poudriere/data
-if [ ! -e /usr/local/poudriere/ports/default ]; then
+mkdir -p $poudriere/data
+if [ ! -e $poudriere/ports/default ]; then
+    # Check out ports tree
     poudriere ports -c
+    
+    # Allow use of bsd.local.mk
+    auto-append-line 'USE_LOCAL_MK=yes' ${poudriere}.d/make.conf $0
+    
+    # Allow wip category
+    auto-append-line 'VALID_CATEGORIES+=wip' \
+	$poudriere/ports/default/Mk/bsd.local.mk
 fi
 
 another=y

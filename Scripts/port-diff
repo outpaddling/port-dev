@@ -16,8 +16,6 @@ if [ 0$category = 0 ] || [ ! -e $PORTSDIR/$category ]; then
     exit 1
 fi
 
-diff_file=/home/$USER/$portname.diff
-
 if [ $# = 1 ]; then
     old_portname=$1
 else
@@ -40,15 +38,13 @@ if grep -q '^CATEGORIES.*wip' Makefile; then
     sed -i .bak -e "/^CATEGORIES/s|wip ||" Makefile
     mv Makefile.bak /tmp/Makefile.bak.$portname
 fi
-if ! diff -ruN --exclude=CVS --exclude=.svn /usr/ports/$category/$old_portname \
-	`pwd` > $diff_file; then
+if ! diff -ruN --exclude=CVS --exclude=.svn \
+	  /usr/ports/$category/$old_portname `pwd`; then
     if [ 0$wip = 01 ]; then
 	mv /tmp/Makefile.bak.$portname Makefile
     fi
-    printf "Patch saved in $diff_file.\n"
 else
     printf "No differences found.\n"
-    rm $diff_file
     if [ 0$wip = 01 ]; then
 	mv /tmp/Makefile.bak.$portname Makefile
     fi
@@ -61,8 +57,9 @@ fi
 category=$(basename $(dirname $(pwd)))
 
 cat << EOM
+===
 
-Submit a PR with the file $diff_file.
+Submit a PR with the diff above.
 
 Summary examples: See porter's guide for details.
     
