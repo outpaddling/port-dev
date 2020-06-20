@@ -13,7 +13,7 @@ pause()
     read junk
 }
 
-if [ $1 = --no-commit ]; then
+if [ 0$1 = 0--no-commit ]; then
     no_commit=1
     shift
 fi
