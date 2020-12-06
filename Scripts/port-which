@@ -19,7 +19,7 @@ default:
 endsw
 
 foreach dir ($dirs)
-    if ( -d $dir && ($dir != "distfiles") && ($dir != "packages") ) then
+    if ( -e $dir/Makefile && ($dir != "Templates") ) then
 	echo "Searching $dir..."
 	cd $dir
 	foreach plist (*/pkg-plist)
