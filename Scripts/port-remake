@@ -102,7 +102,7 @@ if [ 0$no_commit != 01 ]; then
 	if [ -e ../.svn ]; then
 	    svn up
 	elif [ -e ../.git ]; then
-	    git pull
+	    git pull --rebase=false
 	else
 	    printf "This is neither a subversion nor a git repository.\n"
 	    exit 1
