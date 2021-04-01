@@ -64,20 +64,20 @@ if [ 0$regen = 0y ]; then
     $EDITOR pkg-plist.new
     printf "Diff:\n"
     if ! diff -u pkg-plist pkg-plist.new; then
-        while [ 0$new_plist != 0i ]; do
+	while [ 0$new_plist != 0i ]; do
 	    printf "(i)nstall new plist (e)dit (a)bort "
 	    read new_plist
 	    if [ 0$new_plist = 0i ]; then
-	        mv -f pkg-plist.new pkg-plist
-            elif [ 0$new_plist = 0e ]; then
-                $EDITOR pkg-plist.new
-                diff -u pkg-plist pkg-plist.new || true
+		mv -f pkg-plist.new pkg-plist
+	    elif [ 0$new_plist = 0e ]; then
+		$EDITOR pkg-plist.new
+		diff -u pkg-plist pkg-plist.new || true
 	    elif [ 0$new_plist = 0a ]; then
-	        exit 0
-            else
-                printf "Invalid selection.\n"
-            fi
-        done
+		exit 0
+	    else
+		printf "Invalid selection.\n"
+	    fi
+	done
 	make clean
     else
 	printf "No changes to pkg-plist.\n"
@@ -109,9 +109,9 @@ if [ 0$no_commit != 01 ]; then
 	fi
 	printf "Comitting changes...\n"
 	if [ -e ../.svn ]; then
-	    svn ci
+	    svn ci .
 	elif [ -e ../.git ]; then
-	    git commit -a
+	    git commit .
 	    git push
 	fi
     fi
