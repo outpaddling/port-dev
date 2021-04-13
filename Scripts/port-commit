@@ -17,6 +17,19 @@ usage()
 
 
 ##########################################################################
+#   Function description:
+#       Pause until user presses return
+##########################################################################
+
+pause()
+{
+    local junk
+    
+    printf "Press return to continue..."
+    read junk
+}
+
+##########################################################################
 #   Main
 ##########################################################################
 
@@ -24,13 +37,19 @@ if [ $# != 1 ] && [ $# != 2 ]; then
     usage
 fi
 
-printf "Comitting...\n"
-git commit $@
-printf "Stashing local mods...\n"
-git stash push Mk/bsd.local.mk
-printf "Pulling and rebasing...\n"
-git pull -r
-printf "Pushing commits...\n"
-git push
-printf "Unstashing...\n"
-git stash pop
+git status $@
+pause
+git diff $@
+read -p 'Proceed with commit? y/[n] ' proceed
+if [ 0$proceed = 0y ]; then
+    printf "Comitting...\n"
+    git commit $@
+    printf "Stashing local mods...\n"
+    git stash push Mk/bsd.local.mk
+    printf "Pulling and rebasing...\n"
+    git pull -r
+    printf "Pushing commits...\n"
+    git push
+    printf "Unstashing...\n"
+    git stash pop
+fi
