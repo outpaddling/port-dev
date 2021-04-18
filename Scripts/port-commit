@@ -11,7 +11,7 @@
 
 usage()
 {
-    printf "Usage: $0 category/port [category/Makefile]\n"
+    printf "Usage: $0 category/port\n"
     exit 1
 }
 
@@ -33,23 +33,51 @@ pause()
 #   Main
 ##########################################################################
 
-if [ $# != 1 ] && [ $# != 2 ]; then
+if [ $# != 1 ]; then
     usage
 fi
+port=$1
+if ! echo $port | fgrep -q /; then
+    usage
+fi
+category=$(echo $port | cut -d / -f 1)
+makefile=$category/Makefile
+echo $makefile
 
-git status $@
+: ${PORTSDIR:=/usr/ports}
+cd $PORTSDIR
+git status $port $makefile
 pause
-git diff $@
+git diff $port $makefile
+pause
+
 read -p 'Proceed with commit? y/[n] ' proceed
 if [ 0$proceed = 0y ]; then
-    printf "Comitting...\n"
-    git commit $@
+    printf "Ensuring we're on the main branch...\n"
+    git checkout main
+    
+    cat << EOM
+    
+If this is a new port, copy the text below for the commmit message:
+
+EOM
+    printf "${port}: "
+    grep '^COMMENT' $port/Makefile | cut -f 2-
+    printf "\n"
+    cat $port/pkg-descr
+    pause
+
+    git commit $port $makefile
+
     printf "Stashing local mods...\n"
     git stash push Mk/bsd.local.mk
+    
     printf "Pulling and rebasing...\n"
     git pull -r
+    
     printf "Pushing commits...\n"
     git push
+    
     printf "Unstashing...\n"
     git stash pop
 fi
