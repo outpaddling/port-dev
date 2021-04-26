@@ -9,7 +9,7 @@ if [ $# = 1 ]; then
     if [ -z $PORTSDIR ]; then
 	PORTSDIR=/usr/ports
     fi
-    cd $PORTSDIR/wip/$1
+    cd $PORTSDIR/$1
 fi
 
 printf "Remove distfile? y/[n] "
