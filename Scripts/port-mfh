@@ -1,0 +1,70 @@
+#!/bin/sh -e
+
+##########################################################################
+#   Script description:
+#       Commit a port via git
+#       
+#   History:
+#   Date        Name        Modification
+#   2021-04-12  J Bacon     Begin
+##########################################################################
+
+usage()
+{
+    cat << EOM
+
+Usage: $0 quarter commit-hash
+
+Example: $0 2021Q2 0e084ddc8634c8f8436c155ccb2f748a7549db80
+
+EOM
+    exit 1
+}
+
+
+##########################################################################
+#   Function description:
+#       Pause until user presses return
+##########################################################################
+
+pause()
+{
+    local junk
+    
+    printf "Press return to continue..."
+    read junk
+}
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 2 ]; then
+    usage
+fi
+branch=$1
+commit=$2
+
+: ${PORTSDIR:=/usr/ports}
+cd $PORTSDIR
+
+read -p 'Proceed with commit? y/[n] ' proceed
+if [ 0$proceed = 0y ]; then
+    printf "Ensuring we're on the $branch branch...\n"
+    git checkout $branch
+
+    printf "Stashing local mods...\n"
+    git stash push Mk/bsd.local.mk
+    
+    printf "Comitting...\n"
+    git cherry-pick -x $commit
+
+    printf "Pushing commits...\n"
+    git push
+    
+    printf "Unstashing...\n"
+    git stash pop
+    
+    printf "Returning to main branch...\n"
+    git checkout main
+fi
