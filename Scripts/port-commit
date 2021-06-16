@@ -46,7 +46,7 @@ echo $makefile
 
 : ${PORTSDIR:=/usr/ports}
 cd $PORTSDIR
-git status $port $makefile
+git status
 pause
 git diff $port $makefile
 pause
@@ -69,15 +69,20 @@ EOM
 
     git commit $port $makefile
 
-    printf "Stashing local mods...\n"
-    git stash push Mk/bsd.local.mk
+    git status
+    read -p 'Push commits? y/[n] ' push
     
-    printf "Pulling and rebasing...\n"
-    git pull -r
-    
-    printf "Pushing commits...\n"
-    git push
-    
-    printf "Unstashing...\n"
-    git stash pop
+    if [ 0$push = 0y ]; then
+	printf "Stashing local mods...\n"
+	git stash push Mk/bsd.local.mk
+	
+	printf "Pulling and rebasing...\n"
+	git pull -r
+
+	printf "Pushing commits...\n"
+	git push
+	
+	printf "Unstashing...\n"
+	git stash pop
+    fi
 fi
