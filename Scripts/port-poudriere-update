@@ -13,5 +13,9 @@ if [ 0$up2date = 0y ]; then
 	printf "$jail\n"
 	poudriere jail -u -j $jail
     done
+    : ${POUDRIERE_PORTS:=/usr/local/poudriere/ports/default}
+    cd $POUDRIERE_PORTS
+    git stash push Mk/bsd.local.mk
     poudriere ports -u
+    git stash pop
 fi

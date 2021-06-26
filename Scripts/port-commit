@@ -46,6 +46,11 @@ echo $makefile
 
 : ${PORTSDIR:=/usr/ports}
 cd $PORTSDIR
+if grep -w wip $port/Makefile | grep -v '^CATEGORIES'; then
+    printf "$port contains references to wip.  Please fix and try again.\n"
+    exit 1
+fi
+
 git status
 pause
 git diff $port $makefile
