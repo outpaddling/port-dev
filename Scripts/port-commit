@@ -50,6 +50,12 @@ if grep -w wip $port/Makefile | grep -v '^CATEGORIES'; then
     printf "$port contains references to wip.  Please fix and try again.\n"
     exit 1
 fi
+read -p "Run port-check? [y]/n " check
+if [ 0$check != 0n ]; then
+    cd $port
+    port-check
+    cd ../..
+fi
 
 git status
 pause
