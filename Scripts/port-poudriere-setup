@@ -38,7 +38,7 @@ sed -i '' -e "s|^#CCACHE_DIR==|CCACHE_DIR=|" $conf
 mkdir -p $poudriere/data
 if [ ! -e $poudriere/ports/default ]; then
     # Check out ports tree
-    poudriere ports -c
+    poudriere ports -c -m git+https -B main
 fi
 
 # Allow use of bsd.local.mk
