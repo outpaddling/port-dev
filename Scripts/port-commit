@@ -84,16 +84,6 @@ EOM
     read -p 'Push commits? y/[n] ' push
     
     if [ 0$push = 0y ]; then
-	printf "Stashing local mods...\n"
-	git stash push Mk/bsd.local.mk
-	
-	printf "Pulling and rebasing...\n"
-	git pull -r
-
-	printf "Pushing commits...\n"
-	git push
-	
-	printf "Unstashing...\n"
-	git stash pop
+	port-push-commits
     fi
 fi

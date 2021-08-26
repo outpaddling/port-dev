@@ -9,6 +9,7 @@ If your host system is not fully up-to-date, run auto-update-system first.
 EOM
 read -p "Is your host system up-to-date? y/[n] " up2date
 if [ 0$up2date = 0y ]; then
+    umask 022   # Make sure Mk files are readable to "nobody"
     for jail in `poudriere jail -ql | awk '{ print $1 }'`; do
 	printf "$jail\n"
 	poudriere jail -u -j $jail

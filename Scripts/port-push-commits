@@ -1,0 +1,16 @@
+#!/bin/sh -e
+
+: ${PORTSDIR:=/usr/ports}
+cd $PORTSDIR
+
+printf "Stashing local mods...\n"
+git stash push Mk/bsd.local.mk
+
+printf "Pulling and rebasing...\n"
+git pull -r
+
+printf "Pushing commits...\n"
+git push
+
+printf "Unstashing...\n"
+git stash pop
