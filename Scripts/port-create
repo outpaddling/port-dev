@@ -1,0 +1,82 @@
+#!/bin/sh -e
+
+##########################################################################
+#   Description:
+#       Create a new port skeleton
+#       
+#   History:
+#   Date        Name        Modification
+#   2021-10-19  Charlie &   Begin
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0 port-name category maintainer\n"
+    exit 1
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 3 ]; then
+    usage
+fi
+port=$1
+category=$2
+maintainer=$3
+
+mkdir $port
+cd $port
+
+if echo $port | grep '^py-'; then
+    cat << EOM > Makefile
+PORTNAME=       $port
+DISTVERSION=   
+CATEGORIES=     wip $category python
+MASTER_SITES=   CHEESESHOP
+PKGNAMEPREFIX=  \${PYTHON_PKGNAMEPREFIX}
+
+MAINTAINER=     $maintainer
+COMMENT=        
+
+LICENSE=        
+LICENSE_FILE=   
+
+USES=           python
+USE_PYTHON=     autoplist distutils
+
+.include <bsd.port.mk>
+EOM
+
+    cat << EOM > pkg-descr
+[description of the port]
+
+WWW: https://pypi.python.org/pypi/sample
+EOM
+
+else
+
+cat << EOM > Makefile
+PORTNAME=       $port
+DISTVERSION=    
+CATEGORIES=     wip $category
+MASTER_SITES=   
+
+MAINTAINER=     $maintainer
+COMMENT=        
+
+LICENSE=        
+LICENSE_FILE=   
+
+.include <bsd.port.mk>
+EOM
+
+    cat << EOM > pkg-descr
+[description of the port]
+
+WWW: http://example.com
+EOM
+
+fi
