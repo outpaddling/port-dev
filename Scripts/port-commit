@@ -58,6 +58,10 @@ if [ 0$check != 0n ]; then
 fi
 
 git status
+if git status $port | fgrep -q "Untracked"; then
+    printf "Untracked files detected.  Please clean up and try again.\n"
+    exit 1
+fi
 pause
 git diff $port $makefile
 pause
