@@ -1,6 +1,5 @@
 #!/bin/sh -e
 
-
 ##########################################################################
 #   Function description:
 #       Pause until user presses return
@@ -16,6 +15,11 @@ pause()
 
 if ! grep -q '^DEVELOPER=' /etc/make.conf; then
     printf 'DEVELOPER=yes\n' >> /etc/make.conf
+fi
+
+: ${PORTSDIR:=/usr/ports}
+if [ $# = 1 ]; then
+    cd $PORTSDIR/$1
 fi
 
 printf "Remove distfile? y/[n] "

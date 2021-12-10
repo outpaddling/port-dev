@@ -13,30 +13,30 @@ pause()
     read junk
 }
 
-if [ 0$1 = 0--no-commit ]; then
-    no_commit=1
+while echo $1 | grep -q '^-'; do
+    if [ 0$1 = 0--no-commit ]; then
+	no_commit=1
+    elif [ 0$1 = 0--no-check ]; then
+	no_check=1
+    fi
     shift
-fi
+done
 
 case $# in
 0)
     ;;
 
 1)
-    if [ -z $PORTSDIR ]; then
-	PORTSDIR=/usr/ports
-    fi
-    cd $PORTSDIR/wip/$1
+    : ${PORTSDIR:=/usr/ports}
+    cd $PORTSDIR/$1
     ;;
 
 *)
-    printf "Usage: $0 [--no-commit] [port]\n"
+    printf "Usage: $0 [--no-commit] [--no-check] [category/port]\n"
     exit 1
 esac
 
-if [ -z $EDITOR ]; then
-    EDITOR=vi
-fi
+: ${EDITOR:=vi}
 
 pwd
 
@@ -85,14 +85,16 @@ if [ 0$regen = 0y ]; then
     fi
 fi
 
-cat << EOM
+if [ -z "$no_check" ]; then
+    cat << EOM
 
 =====================
 Running port-check...
 =====================
 
 EOM
-port-check
+    port-check
+fi
 
 if [ 0$no_commit != 01 ]; then
     printf "Commit changes to port? y/[n] "
