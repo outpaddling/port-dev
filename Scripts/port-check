@@ -29,8 +29,14 @@ if [ 0$distclean = 0y ]; then
 else
     make clean
 fi
-portlint -AC
-pause
+if ! portlint -AC; then
+    read -p 'Continue? y/[n] ' continue
+    if [ 0$continue != 0y ]; then
+	exit
+    fi
+else
+    pause
+fi
 make deinstall
 make rmconfig
 make reinstall
