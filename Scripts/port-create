@@ -3,6 +3,8 @@
 ##########################################################################
 #   Description:
 #       Create a new port skeleton
+#       Do not edit with APE, which will replace the TABs in the
+#       Makefile heredoc with spaces
 #       
 #   History:
 #   Date        Name        Modification
@@ -32,20 +34,20 @@ cd $port
 
 if echo $port | grep '^py-'; then
     cat << EOM > Makefile
-PORTNAME=       $port
-DISTVERSION=   
-CATEGORIES=     wip $category python
-MASTER_SITES=   CHEESESHOP
-PKGNAMEPREFIX=  \${PYTHON_PKGNAMEPREFIX}
+PORTNAME=	${port#py-}
+DISTVERSION=	
+CATEGORIES=	wip $category python
+MASTER_SITES=	CHEESESHOP
+PKGNAMEPREFIX=	\${PYTHON_PKGNAMEPREFIX}
 
-MAINTAINER=     $maintainer
-COMMENT=        
+MAINTAINER=	$maintainer
+COMMENT=	
 
-LICENSE=        
-LICENSE_FILE=   
+LICENSE=	
+LICENSE_FILE=	
 
-USES=           python
-USE_PYTHON=     autoplist distutils
+USES=		python
+USE_PYTHON=	autoplist distutils
 
 .include <bsd.port.mk>
 EOM
@@ -53,22 +55,22 @@ EOM
     cat << EOM > pkg-descr
 [description of the port]
 
-WWW: https://pypi.python.org/pypi/sample
+WWW: https://pypi.python.org/project/$port/
 EOM
 
 else
 
 cat << EOM > Makefile
-PORTNAME=       $port
-DISTVERSION=    
-CATEGORIES=     wip $category
-MASTER_SITES=   
+PORTNAME=	$port
+DISTVERSION=	
+CATEGORIES=	wip $category
+MASTER_SITES=	
 
-MAINTAINER=     $maintainer
-COMMENT=        
+MAINTAINER=	$maintainer
+COMMENT=	
 
-LICENSE=        
-LICENSE_FILE=   
+LICENSE=	
+LICENSE_FILE=	
 
 .include <bsd.port.mk>
 EOM
@@ -76,7 +78,7 @@ EOM
     cat << EOM > pkg-descr
 [description of the port]
 
-WWW: http://example.com
+WWW: http://example.com/$port
 EOM
 
 fi
