@@ -55,7 +55,7 @@ EOM
     cat << EOM > pkg-descr
 [description of the port]
 
-WWW: https://pypi.python.org/project/$port/
+WWW: https://pypi.python.org/project/${port#py-}/
 EOM
 
 else
@@ -78,7 +78,7 @@ EOM
     cat << EOM > pkg-descr
 [description of the port]
 
-WWW: http://example.com/$port
+WWW: https://example.com/$port
 EOM
 
 fi
