@@ -65,13 +65,16 @@ if [ 0$regen = 0y ]; then
     printf "Diff:\n"
     if ! diff -u pkg-plist pkg-plist.new; then
 	while [ 0$new_plist != 0i ]; do
-	    printf "(i)nstall new plist (e)dit (a)bort "
+	    printf "(i)nstall new plist (e)dit (s)hell (a)bort "
 	    read new_plist
 	    if [ 0$new_plist = 0i ]; then
 		mv -f pkg-plist.new pkg-plist
 	    elif [ 0$new_plist = 0e ]; then
 		$EDITOR pkg-plist.new
-		diff -u pkg-plist pkg-plist.new || true
+		diff -u pkg-plist pkg-plist.new | more
+	    elif [ 0$new_plist = 0s ]; then
+		$SHELL
+		diff -u pkg-plist pkg-plist.new | more
 	    elif [ 0$new_plist = 0a ]; then
 		exit 0
 	    else
