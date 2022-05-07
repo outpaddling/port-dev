@@ -56,35 +56,34 @@ fi
 
 env BATCH=1 make depends
 
-printf "Regenerate plist? y/[n] "
-read regen
-if [ 0$regen = 0y ]; then
-    make clean stage
-    make makeplist > pkg-plist.new
-    $EDITOR pkg-plist.new
-    printf "Diff:\n"
-    if ! diff -u pkg-plist pkg-plist.new; then
-	while [ 0$new_plist != 0i ]; do
-	    printf "(i)nstall new plist (e)dit (s)hell (a)bort "
-	    read new_plist
-	    if [ 0$new_plist = 0i ]; then
-		mv -f pkg-plist.new pkg-plist
-	    elif [ 0$new_plist = 0e ]; then
-		$EDITOR pkg-plist.new
-		diff -u pkg-plist pkg-plist.new | more
-	    elif [ 0$new_plist = 0s ]; then
-		$SHELL
-		diff -u pkg-plist pkg-plist.new | more
-	    elif [ 0$new_plist = 0a ]; then
-		exit 0
-	    else
-		printf "Invalid selection.\n"
-	    fi
-	done
-	make clean
-    else
-	printf "No changes to pkg-plist.\n"
-	rm -f pkg-plist.new
+if [ -e pkg-plist ]; then
+    printf "Regenerate plist? y/[n] "
+    read regen
+    if [ 0$regen = 0y ]; then
+	make clean stage
+	make makeplist > pkg-plist.new
+	$EDITOR pkg-plist.new
+	printf "Diff:\n"
+	if ! diff -u pkg-plist pkg-plist.new; then
+	    while [ 0$new_plist != 0i ]; do
+		printf "(i)nstall new plist (e)dit (a)bort "
+		read new_plist
+		if [ 0$new_plist = 0i ]; then
+		    mv -f pkg-plist.new pkg-plist
+		elif [ 0$new_plist = 0e ]; then
+		    $EDITOR pkg-plist.new
+		    diff -u pkg-plist pkg-plist.new || true
+		elif [ 0$new_plist = 0a ]; then
+		    exit 0
+		else
+		    printf "Invalid selection.\n"
+		fi
+	    done
+	    make clean
+	else
+	    printf "No changes to pkg-plist.\n"
+	    rm -f pkg-plist.new
+	fi
     fi
 fi
 
