@@ -96,9 +96,9 @@ EOM
     
     if [ $arch = amd64 ]; then
 	name=`echo $release | cut -d - -f 1 | tr '.' '-'`-i386
-	printf "Create $name as well? [y]/n "
+	printf "Create $name as well? y/[n] "
 	read i386
-	if [ 0$i386 != 0n ]; then
+	if [ 0"$i386" = 0y ]; then
 	    poudriere jail -c -j "$name" -v $release -a i386 || true
 	fi
     fi
