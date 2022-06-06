@@ -49,7 +49,7 @@ else
 fi
 
 # Check for metaports
-if fgrep -q MASTER_SITES Makefile || fgrep -q USE_GITHUB Makefile; then
+if fgrep -q MASTER_SITES Makefile || fgrep -q USE_GIT Makefile; then
     rm -f distinfo
     make makesum
 fi
