@@ -41,7 +41,7 @@ port_dir=`pwd`
 # If WRKSRC is not set, assume first two components of pathname
 grandparent=${port_dir%/*/*}
 port=${port_dir#$grandparent/}
-WRKSRC=`auto-print-make-variable -p $grandparent $port WRKSRC`
+WRKSRC=`auto-print-make-variable --base-dir $grandparent $port WRKSRC`
 # Get relative path
 WRKSRC=${WRKSRC#$port_dir/}
 
