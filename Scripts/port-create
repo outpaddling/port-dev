@@ -34,28 +34,27 @@ cd $port
 
 if echo $port | grep '^py-'; then
     cat << EOM > Makefile
-PORTNAME=	${port#py-}
-DISTVERSION=	
-CATEGORIES=	wip $category python
-MASTER_SITES=	CHEESESHOP
-PKGNAMEPREFIX=	\${PYTHON_PKGNAMEPREFIX}
+PORTNAME=       ${port#py-}
+DISTVERSION=    
+CATEGORIES=     wip $category python
+MASTER_SITES=   CHEESESHOP
+PKGNAMEPREFIX=  \${PYTHON_PKGNAMEPREFIX}
 
-MAINTAINER=	$maintainer
-COMMENT=	
+MAINTAINER=     $maintainer
+COMMENT=        
+WWW=            https://pypi.python.org/project/${port#py-}/
 
-LICENSE=	
-LICENSE_FILE=	
+LICENSE=        
+LICENSE_FILE=   
 
-USES=		python
-USE_PYTHON=	autoplist distutils
+USES=           python
+USE_PYTHON=     autoplist distutils
 
 .include <bsd.port.mk>
 EOM
 
     cat << EOM > pkg-descr
 [description of the port]
-
-WWW: https://pypi.python.org/project/${port#py-}/
 EOM
 
 else
@@ -68,6 +67,7 @@ MASTER_SITES=
 
 MAINTAINER=	$maintainer
 COMMENT=	
+WWW=		https://example.com/$port
 
 LICENSE=	
 LICENSE_FILE=	
@@ -77,8 +77,6 @@ EOM
 
     cat << EOM > pkg-descr
 [description of the port]
-
-WWW: https://example.com/$port
 EOM
 
 fi
