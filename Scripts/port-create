@@ -32,23 +32,25 @@ maintainer=$3
 mkdir $port
 cd $port
 
+tab="$(printf '\t')"
+
 if echo $port | grep '^py-'; then
     cat << EOM > Makefile
-PORTNAME=       ${port#py-}
-DISTVERSION=    
-CATEGORIES=     wip $category python
-MASTER_SITES=   CHEESESHOP
-PKGNAMEPREFIX=  \${PYTHON_PKGNAMEPREFIX}
+PORTNAME=${tab}${port#py-}
+DISTVERSION=${tab}
+CATEGORIES=${tab}wip $category python
+MASTER_SITES=${tab}CHEESESHOP
+PKGNAMEPREFIX=${tab}\${PYTHON_PKGNAMEPREFIX}
 
-MAINTAINER=     $maintainer
-COMMENT=        
-WWW=            https://pypi.python.org/project/${port#py-}/
+MAINTAINER=${tab}$maintainer
+COMMENT=${tab}
+WWW=${tab}${tab}https://pypi.python.org/project/${port#py-}/
 
-LICENSE=        
-LICENSE_FILE=   
+LICENSE=${tab}
+LICENSE_FILE=${tab}
 
-USES=           python
-USE_PYTHON=     autoplist distutils
+USES=${tab}${tab}python
+USE_PYTHON=${tab}autoplist distutils
 
 .include <bsd.port.mk>
 EOM
@@ -60,17 +62,17 @@ EOM
 else
 
 cat << EOM > Makefile
-PORTNAME=	$port
-DISTVERSION=	
-CATEGORIES=	wip $category
-MASTER_SITES=	
+PORTNAME=${tab}$port
+DISTVERSION=${tab}
+CATEGORIES=${tab}wip $category
+MASTER_SITES=${tab}
 
-MAINTAINER=	$maintainer
-COMMENT=	
-WWW=		https://example.com/$port
+MAINTAINER=${tab}$maintainer
+COMMENT=${tab}
+WWW=${tab}${tab}https://example.com/$port
 
-LICENSE=	
-LICENSE_FILE=	
+LICENSE=${tab}
+LICENSE_FILE=${tab}
 
 .include <bsd.port.mk>
 EOM
