@@ -78,6 +78,10 @@ fi
 if [ -z $PORTSDIR ]; then
     PORTSDIR=/usr/ports
 fi
+if [ ! -e $PORTSDIR/$port ]; then
+    printf "${port}: No such port.\n"
+    exit 1
+fi
 
 for jailname in $jails; do
     printf "Starting build on $jailname...\n"
