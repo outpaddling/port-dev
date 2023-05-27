@@ -63,7 +63,7 @@ if git status $port | fgrep -q "Untracked"; then
     exit 1
 fi
 pause
-git diff $port $makefile
+git diff $port $makefile || true
 pause
 
 read -p 'Proceed with commit? y/[n] ' proceed
