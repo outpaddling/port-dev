@@ -120,9 +120,3 @@ if [ 0$no_commit != 01 ]; then
 	fi
     fi
 fi
-
-printf "Deinstall? y/[n] "
-read deinstall
-if [ 0$deinstall = 0y ]; then
-    make deinstall
-fi
