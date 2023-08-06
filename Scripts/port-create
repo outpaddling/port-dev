@@ -39,7 +39,7 @@ if echo $port | grep '^py-'; then
 PORTNAME=${tab}${port#py-}
 DISTVERSION=${tab}
 CATEGORIES=${tab}wip $category python
-MASTER_SITES=${tab}CHEESESHOP
+MASTER_SITES=${tab}PYPI
 PKGNAMEPREFIX=${tab}\${PYTHON_PKGNAMEPREFIX}
 
 MAINTAINER=${tab}$maintainer
