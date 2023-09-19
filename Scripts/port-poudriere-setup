@@ -19,14 +19,19 @@ if [ ! -e $conf ]; then
     cp $conf.sample $conf
 fi
 
-df
-default_zpool=`awk -F = '$1 == "ZPOOL" { print $2 }' $conf`
-printf "ZFS pool? [$default_zpool] "
-read zfs
-if [ 0$zfs != 0 ]; then
-    sed -i '' -e "s|^#ZPOOL.*|ZPOOL=$zfs|" $conf
-else
+printf "Use ZFS? [y]/n "
+read use_zfs
+if [ 0"$use_zfs" = 0n ]; then
     sed -i '' -e 's|^#NO_ZFS=|NO_ZFS=|' $conf
+else
+    sed -i '' -e "s|^#ZPOOL.*|ZPOOL=$zfs|" $conf
+    df
+    default_zpool=`awk -F = '$1 == "ZPOOL" { print $2 }' $conf`
+    printf "ZFS pool? [$default_zpool] "
+    read zfs
+    if [ -z "$zfs" ]; then
+	zfs=$default_zfs
+    fi
 fi
 $EDITOR $conf
 
