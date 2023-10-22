@@ -1,0 +1,35 @@
+#!/bin/sh -e
+
+##########################################################################
+#   Description:
+#       List all dependents of a port/package
+#       
+#   History:
+#   Date        Name        Modification
+#   2021-12-14  ,,,         Begin
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0 category/name [category/name]\n"
+    exit 1
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# -lt 1 ]; then
+    usage
+fi
+
+for name in "$@"; do
+    if ! echo $name | fgrep -q /; then
+	usage
+    fi
+done
+
+for name in "$@"; do
+    port-grep "DEPENDS.*$name" -l | sed -e 's|/Makefile$||'
+done
