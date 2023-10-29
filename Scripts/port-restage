@@ -1,5 +1,5 @@
 #!/bin/sh -e
 
-rm -f work/.build_done* work/.stage_done* work/.PLIST.mktmp
+rm -rf work/.build_done* work/.stage_done* work/.PLIST.mktmp work/stage
 make deinstall reinstall
 

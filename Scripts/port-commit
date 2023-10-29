@@ -50,8 +50,8 @@ if grep -w wip $port/Makefile | grep -v '^CATEGORIES'; then
     printf "$port contains references to wip.  Please fix and try again.\n"
     exit 1
 fi
-read -p "Run port-check? [y]/n " check
-if [ 0$check != 0n ]; then
+read -p "Run port-check? y/[n] " check
+if [ 0$check = 0y ]; then
     cd $port
     port-check
     cd ../..
@@ -80,6 +80,16 @@ EOM
     grep '^COMMENT' $port/Makefile | cut -f 2-
     printf "\n"
     cat $port/pkg-descr
+    
+    cat << EOM
+    
+If this is an update, copy the text below for the commmit message:
+
+EOM
+    printf "${port}: "
+    printf "Update to "
+    auto-print-make-variable $port PKGVERSION
+    printf "\n"
     pause
 
     git commit $port $makefile
