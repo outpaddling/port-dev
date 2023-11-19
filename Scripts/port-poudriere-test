@@ -87,7 +87,7 @@ for jailname in $jails; do
     printf "Starting build on $jailname...\n"
     terminal_output=buildlog-$jailname-$(echo $port | sed -e 's|/|-|g')
     stty intr undef
-    if ! poudriere testport -j $jailname -o $port 2>&1 | tee $terminal_output; then
+    if ! poudriere testport -b latest -j $jailname -o $port 2>&1 | tee $terminal_output; then
 	stty intr ^C
 	exit 1
     fi
