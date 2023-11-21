@@ -78,6 +78,13 @@ fi
 if [ -z $PORTSDIR ]; then
     PORTSDIR=/usr/ports
 fi
+
+printf "Update poudriere? [y]/n "
+read update
+if [ 0"$update" != 0n ]; then
+    port-poudriere-update
+fi
+
 if [ ! -e $PORTSDIR/$port ]; then
     printf "${port}: No such port.\n"
     exit 1
