@@ -19,4 +19,8 @@ if [ 0$up2date = 0y ]; then
     git stash push Mk/bsd.local.mk
     poudriere ports -u
     git stash pop
+else
+    # Terminate caller (e.g. wip-poudriere-test) if user selects poudriere
+    # update and says system is out of date
+    exit 1
 fi
