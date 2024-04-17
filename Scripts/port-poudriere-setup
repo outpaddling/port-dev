@@ -24,7 +24,6 @@ read use_zfs
 if [ 0"$use_zfs" = 0n ]; then
     sed -i '' -e 's|^#NO_ZFS=|NO_ZFS=|' $conf
 else
-    sed -i '' -e "s|^#ZPOOL.*|ZPOOL=$zfs|" $conf
     df
     default_zpool=`awk -F = '$1 == "ZPOOL" { print $2 }' $conf`
     printf "ZFS pool? [$default_zpool] "
@@ -32,6 +31,8 @@ else
     if [ -z "$zfs" ]; then
 	zfs=$default_zfs
     fi
+    sed -i '' -e "s|^ZPOOL.*|ZPOOL=$zfs|" $conf     # If already enabled
+    sed -i '' -e "s|^#ZPOOL.*|ZPOOL=$zfs|" $conf
 fi
 $EDITOR $conf
 
