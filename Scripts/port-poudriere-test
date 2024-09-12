@@ -59,7 +59,7 @@ if [ $# -lt 2 ]; then
 fi
 
 args=$#
-invoked_as=$0
+invoked_as=$(basename $0)
 port=$1
 shift
 jails="$@"
