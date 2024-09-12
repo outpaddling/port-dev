@@ -2,7 +2,7 @@
 
 ##########################################################################
 #   Script description:
-#       Run poudriere testport under one or more jails
+#       Run poudriere testport/bulk under one or more jails
 #       
 #   History:
 #   Date        Name        Modification
@@ -59,6 +59,7 @@ if [ $# -lt 2 ]; then
 fi
 
 args=$#
+invoked_as=$0
 port=$1
 shift
 jails="$@"
@@ -94,8 +95,18 @@ for jailname in $jails; do
     printf "Starting build on $jailname...\n"
     terminal_output=buildlog-$jailname-$(echo $port | sed -e 's|/|-|g')
     stty intr undef
-    if ! poudriere testport -b latest -j $jailname -o $port 2>&1 | tee $terminal_output; then
-	stty intr ^C
+    if [ $invoked_as = port-poudriere-test ]; then
+	if ! poudriere testport -b latest -j $jailname -o $port 2>&1 | tee $terminal_output; then
+	    stty intr ^C
+	    exit 1
+	fi
+    elif [ $invoked_as = port-poudriere-pkg ]; then
+	if ! poudriere bulk -b latest -j $jailname $port 2>&1 | tee $terminal_output; then
+	    stty intr ^C
+	    exit 1
+	fi
+    else
+	printf "$0: Not a valid invocation.\n"
 	exit 1
     fi
     stty intr ^C
