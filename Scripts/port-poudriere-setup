@@ -27,12 +27,12 @@ else
     df
     default_zpool=`awk -F = '$1 == "ZPOOL" { print $2 }' $conf`
     printf "ZFS pool? [$default_zpool] "
-    read zfs
-    if [ -z "$zfs" ]; then
-	zfs=$default_zfs
+    read zpool
+    if [ -z "$zpool" ]; then
+	zpool=$default_zpool
     fi
-    sed -i '' -e "s|^ZPOOL.*|ZPOOL=$zfs|" $conf     # If already enabled
-    sed -i '' -e "s|^#ZPOOL.*|ZPOOL=$zfs|" $conf
+    sed -i '' -e "s|^ZPOOL.*|ZPOOL=$zpool|" $conf     # If already enabled
+    sed -i '' -e "s|^#ZPOOL.*|ZPOOL=$zpool|" $conf
 fi
 $EDITOR $conf
 
