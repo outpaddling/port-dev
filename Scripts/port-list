@@ -14,7 +14,7 @@
 
 usage()
 {
-    printf "Usage: $0 'pattern'\n"
+    printf "Usage: $0 'partial-glob-pattern'\n"
     exit 1
 }
 
