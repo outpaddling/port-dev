@@ -8,7 +8,7 @@ fi
 umask 022
 
 if ! which poudriere > /dev/null; then
-    pkg install poudriere-devel
+    pkg install -y poudriere
 fi
 
 etc=/usr/local/etc
@@ -36,7 +36,8 @@ else
 fi
 $EDITOR $conf
 
-mirror=`auto-fastest-mirror`
+# mirror=`auto-fastest-mirror`
+mirror='https://download.FreeBSD.org'
 sed -i '' -e "s|_PROTO_://_CHANGE_THIS_|$mirror|" $conf
 sed -i '' -e "s|^#POUDRIERE_DATA=|POUDRIERE_DATA=|" $conf
 sed -i '' -e "s|^#CCACHE_DIR==|CCACHE_DIR=|" $conf
@@ -95,7 +96,9 @@ EOM
     fi
     
     if [ ! -e $poudriere/jails/$name ]; then
-	poudriere jail -c -j "$name" -v $release -a $arch || true
+	set -x
+	poudriere jail -c -j "$name" -v $release || true
+	set +x
     else
 	printf "Jail $name already exists.\n"
     fi
@@ -112,4 +115,3 @@ EOM
     printf "Create another jail for an older release? y/[n] "
     read another
 done
-
