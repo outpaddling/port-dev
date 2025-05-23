@@ -32,7 +32,7 @@
 
 usage()
 {
-    printf "Usage: $0\n"
+    printf "Usage: $0 work/path/to/file\n"
     exit 64     # sysexits(3) EX_USAGE
 }
 
@@ -41,13 +41,8 @@ usage()
 #   Main
 ##########################################################################
 
-if [ $# != 0 ]; then
-    usage
-fi
-
 if [ $# != 1 ]; then
-    printf "Usage: $0 filename\n"
-    exit 1
+    usage
 fi
 
 file="${1#./}"
@@ -68,4 +63,3 @@ read resp
 if [ 0$resp = 0y ]; then
     port-mkpatch "$file"
 fi
-

@@ -27,27 +27,7 @@
 #   See also:
 #       port-check(1), port-create(1), port-diff(1), port-patch-edit(1),
 #       port-remake(1), port-reinstall(1), port-restage(1)
-##########################################################################
-
-usage()
-{
-    printf "Usage: $0\n"
-    exit 64     # sysexits(3) EX_USAGE
-}
-
-
-##########################################################################
-#   Main
-##########################################################################
-
-if [ $# != 0 ]; then
-    usage
-fi
-
-##########################################################################
-#   Script description:
-#       Generate a patch file and store in files dir with canonical name
-#       
+#
 #   History:
 #   Date        Name        Modification
 #   2014-11-10  J Bacon     Begin

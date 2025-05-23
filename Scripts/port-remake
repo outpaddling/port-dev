@@ -2,7 +2,7 @@
 
 ##########################################################################
 #   Synopsis:
-#       port-remake
+#       port-remake [--no-commit] [--no-check] [category/port]
 #       
 #   Description:
 #       .B port-remake
@@ -15,7 +15,9 @@
 #       a successful build and install.
 #       
 #   Arguments:
-#       None
+#       --no-commit     Don't prompt for or run commit
+#       --no-check      Don't prompt for or run port-check
+#       category/port   Alternative to CWD
 #       
 #   Returns:
 #       0 on success, non-zero error codes otherwise
@@ -27,7 +29,7 @@
 
 usage()
 {
-    printf "Usage: $0\n"
+    printf "Usage: $0 [--no-commit] [--no-check] [category/port]\n"
     exit 64     # sysexits(3) EX_USAGE
 }
 
@@ -73,8 +75,7 @@ case $# in
     ;;
 
 *)
-    printf "Usage: $0 [--no-commit] [--no-check] [category/port]\n"
-    exit 1
+    usage
 esac
 
 : ${EDITOR:=vi}
