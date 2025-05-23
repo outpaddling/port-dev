@@ -52,10 +52,6 @@ pause()
 #   Main
 ##########################################################################
 
-if [ $# != 0 ]; then
-    usage
-fi
-
 while echo $1 | grep -q '^-'; do
     if [ 0$1 = 0--no-commit ]; then
 	no_commit=1
