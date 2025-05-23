@@ -1,5 +1,42 @@
 #!/bin/sh -e
 
+##########################################################################
+#   Synopsis:
+#       port-restage
+#       
+#   Description:
+#       .B port-restage
+#       reruns the stage and install phases of the port in the current
+#       working directory, without running any prior stages such as
+#       fetch, patch, build, etc.  It is meant for quickly testing fixes to
+#       the stage and install targets or pkg-plist.
+#       
+#   Arguments:
+#       None
+#       
+#   Returns:
+#       0 on success, non-zero error codes otherwise
+#
+#   See also:
+#       port-check(1), port-create(1), port-diff(1), port-mkpatch(1),
+#       port-patch-edit(1), port-reinstall(1), port-remake(1)
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0\n"
+    exit 64     # sysexits(3) EX_USAGE
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 0 ]; then
+    usage
+fi
+
 rm -rf work/.build_done* work/.stage_done* work/.PLIST.mktmp work/stage
 make deinstall reinstall
 

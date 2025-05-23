@@ -1,5 +1,41 @@
 #!/bin/sh -e
 
+##########################################################################
+#   Synopsis:
+#       port-diff
+#       
+#   Description:
+#       .B port-diff
+#       runs "diff -ruN" between the committed port and the current working
+#       directory.  The path of the committed port is determined using
+#       CATEGORIES and the directory name of the CWD.
+#       
+#   Arguments:
+#       None
+#       
+#   Returns:
+#       0 on success, non-zero error codes otherwise
+#
+#   See also:
+#       port-check(1), port-create(1), port-mkpatch(1), port-patch-edit(1)
+#       port-remake(1), port-reinstall(1), port-restage(1)
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0\n"
+    exit 64     # sysexits(3) EX_USAGE
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 0 ]; then
+    usage
+fi
+
 if [ ! -e pkg-descr ] && ! fgrep -q MASTERDIR Makefile; then
     printf "You must run this script from within port directory.\n"
     exit 1
@@ -21,8 +57,6 @@ if [ $# = 1 ]; then
 else
     old_portname=$portname
 fi
-#printf "port name = $portname\n"
-#printf "category = $category\n"
 
 if [ ! -e /usr/ports/$category/$old_portname ]; then
     printf "Error: /usr/ports/$category/$old_portname does not exist.\n"

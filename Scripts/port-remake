@@ -22,7 +22,7 @@
 #
 #   See also:
 #       port-check(1), port-create(1), port-diff(1), port-mkpatch(1),
-#       port-patch-edit(1), port-restage(1), port-reinstall(1)
+#       port-patch-edit(1), port-reinstall(1), port-restage(1)
 ##########################################################################
 
 usage()

@@ -13,7 +13,7 @@
 #       It must be run from a port directory.
 #       
 #   Arguments:
-#       Path to the file to be patched
+#       work/path/to/file   Path to patched file relative to port directory
 #       
 #   Returns:
 #       0 on success, non-zero error codes otherwise
@@ -23,7 +23,7 @@
 #
 #   See also:
 #       port-check(1), port-create(1), port-diff(1), port-mkpatch(1),
-#       port-remake(1), port-restage(1), port-reinstall(1)
+#       port-remake(1), port-reinstall(1), port-restage(1)
 #       
 #   History:
 #   Date        Name        Modification
