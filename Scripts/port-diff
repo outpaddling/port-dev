@@ -2,7 +2,7 @@
 
 ##########################################################################
 #   Synopsis:
-#       port-diff
+#       port-diff [port-name]
 #       
 #   Description:
 #       .B port-diff
@@ -11,7 +11,7 @@
 #       CATEGORIES and the directory name of the CWD.
 #       
 #   Arguments:
-#       None
+#       port-name   Name of port if different from CWD
 #       
 #   Returns:
 #       0 on success, non-zero error codes otherwise
@@ -32,7 +32,7 @@ usage()
 #   Main
 ##########################################################################
 
-if [ $# != 0 ]; then
+if [ $# -gt 1 ]; then
     usage
 fi
 
