@@ -1,8 +1,43 @@
 #!/bin/sh -e
 
+##########################################################################
+#   Synopsis:
+#       port-reinstall [category/port]
+#       
+#   Description:
+#       .B port-reinstall
+#       cleans, removes, and reinstalls the port in the current working
+#       directory, or the one named by category/port under $PORTSDIR,
+#       which defaults to /usr/ports.
+#       
+#   Arguments:
+#       category/port   Alternative to the CWD
+#       
+#   Returns:
+#       0 on success, non-zero error codes otherwise
+#
+#   Examples:
+#       cd /usr/ports/biology/biolibc && port-reinstall
+#       port-reinstall biology/biolibc
+#
+#   See also:
+#       port-check(1), port-create(1), port-diff(1), port-mkpatch(1),
+#       port-patch-edit(1), port-remake(1), port-restage(1)
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0 [category/port]\n"
+    exit 64     # sysexits(3) EX_USAGE
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
 if [ $# -gt 1 ]; then
-    printf "Usage: $0 [port]\n"
-    exit 1
+    usage
 fi
 
 if [ $# = 1 ]; then
@@ -23,4 +58,4 @@ fi
 make
 make deinstall
 make install
-
+make distclean
