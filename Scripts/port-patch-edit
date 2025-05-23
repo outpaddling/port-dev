@@ -1,0 +1,71 @@
+#!/bin/sh -e
+
+##########################################################################
+#   Synopsis:
+#       port-patch-edit work/path/to/file
+#       
+#   Description:
+#       .B port-patch-edit
+#       creates a backup of the specified file under ${WRKSRC},
+#       invokes $EDITOR on the
+#       file, and generates an appropriate patch file in the
+#       files directory.
+#       It must be run from a port directory.
+#       
+#   Arguments:
+#       Path to the file to be patched
+#       
+#   Returns:
+#       0 on success, non-zero error codes otherwise
+#
+#   Examples:
+#       port-patch-edit work/fasda-0.2.0/fold-change.c
+#
+#   See also:
+#       port-check(1), port-create(1), port-diff(1), port-mkpatch(1),
+#       port-remake(1), port-restage(1), port-reinstall(1)
+#       
+#   History:
+#   Date        Name        Modification
+#   2025-05-22  Jason Bacon Begin
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0\n"
+    exit 64     # sysexits(3) EX_USAGE
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 0 ]; then
+    usage
+fi
+
+if [ $# != 1 ]; then
+    printf "Usage: $0 filename\n"
+    exit 1
+fi
+
+file="${1#./}"
+if [ ! -e "$file" ]; then
+    printf "%s: No such file.\n" "$file"
+    exit 1
+fi
+
+if [ ! -e "$file.orig" ]; then
+    cp "$file" "$file.orig"
+fi
+
+: ${EDITOR:=vi}
+$EDITOR "$file"
+
+printf 'Regenerate patch file? y/[n] '
+read resp
+if [ 0$resp = 0y ]; then
+    port-mkpatch "$file"
+fi
+

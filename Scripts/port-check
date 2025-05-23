@@ -1,6 +1,35 @@
 #!/bin/sh -e
 
 ##########################################################################
+#   Synopsis:
+#       port-check
+#       
+#   Description:
+#       .B port-check
+#       runs portlint(1) in the current working directory, and then
+#       cleans, rebuilds, and reinstalls the port for testing.
+#       It sets DEVELOPER=yes in /etc/make.conf if it is not already
+#       set, to ensure that stage QA measures are run.
+#       
+#   Arguments:
+#       None
+#       
+#   Returns:
+#       0 on success, non-zero error codes otherwise
+#
+#   See also:
+#       port-create(1), port-diff(1), port-mkpatch(1), port-patch-edit(1)
+#       port-remake(1), port-restage(1), port-reinstall(1)
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0\n"
+    exit 64     # sysexits(3) EX_USAGE
+}
+
+
+##########################################################################
 #   Function description:
 #       Pause until user presses return
 ##########################################################################
@@ -12,6 +41,15 @@ pause()
     printf "Press return to continue..."
     read junk
 }
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 0 ]; then
+    usage
+fi
 
 if ! grep -q '^DEVELOPER=' /etc/make.conf; then
     printf 'DEVELOPER=yes\n' >> /etc/make.conf

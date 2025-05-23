@@ -1,6 +1,38 @@
 #!/bin/sh -e
 
 ##########################################################################
+#   Synopsis:
+#       port-remake
+#       
+#   Description:
+#       .B port-remake
+#       is used to rebuild and reinstall
+#       the port in the current working directory
+#       following changes.  It optionally removes the distfile(s)
+#       so that the fetch stage is tested, optionally regenerates
+#       pkg-plist, allowing the user unlimited chances to make
+#       manual changes, and optionally commits the changes after
+#       a successful build and install.
+#       
+#   Arguments:
+#       None
+#       
+#   Returns:
+#       0 on success, non-zero error codes otherwise
+#
+#   See also:
+#       port-check(1), port-create(1), port-diff(1), port-mkpatch(1),
+#       port-patch-edit(1), port-restage(1), port-reinstall(1)
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0\n"
+    exit 64     # sysexits(3) EX_USAGE
+}
+
+
+##########################################################################
 #   Function description:
 #       Pause until user presses return
 ##########################################################################
@@ -12,6 +44,15 @@ pause()
     printf "Press return to continue..."
     read junk
 }
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 0 ]; then
+    usage
+fi
 
 while echo $1 | grep -q '^-'; do
     if [ 0$1 = 0--no-commit ]; then
