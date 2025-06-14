@@ -72,8 +72,14 @@ if grep -q '^CATEGORIES.*wip' Makefile; then
     sed -i .bak -e "/^CATEGORIES/s|wip ||" Makefile
     mv Makefile.bak /tmp/Makefile.bak.$portname
 fi
+rm -f patch.$portname
 if ! diff -ruN --exclude=CVS --exclude=.svn \
 	  /usr/ports/$category/$old_portname `pwd`; then
+    # Send patch direct to file.  Copy and paste from terminal may convert
+    # tabs to spaces.
+    diff -ruN --exclude=CVS --exclude=.svn \
+	  /usr/ports/$category/$old_portname `pwd` > patch.$portname || true
+    printf "Patch saved to patch.$portname.\n"
     if [ 0$wip = 01 ]; then
 	mv /tmp/Makefile.bak.$portname Makefile
     fi
