@@ -74,12 +74,12 @@ if grep -q '^CATEGORIES.*wip' Makefile; then
 fi
 rm -f patch.$portname
 if ! diff -ruN --exclude=CVS --exclude=.svn \
-	  /usr/ports/$category/$old_portname `pwd`; then
+	  /usr/ports/$category/$old_portname `pwd` > /dev/null; then
     # Send patch direct to file.  Copy and paste from terminal may convert
     # tabs to spaces.
     diff -ruN --exclude=CVS --exclude=.svn \
 	  /usr/ports/$category/$old_portname `pwd` > patch.$portname || true
-    printf "Patch saved to patch.$portname.\n"
+    more patch.$portname
     if [ 0$wip = 01 ]; then
 	mv /tmp/Makefile.bak.$portname Makefile
     fi
@@ -96,10 +96,10 @@ fi
 
 category=$(basename $(dirname $(pwd)))
 
-cat << EOM
+cat << EOM | more
 ===
 
-Submit a PR with the diff above.
+Submit a PR with the patch.$portname attached.
 
 Summary examples: See porter's guide for details.
     
