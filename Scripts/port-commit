@@ -47,6 +47,11 @@ cd $PORTSDIR
 category=$(echo $port | cut -d / -f 1)
 makefile=$category/Makefile
 
+# FIXME: 
+# printf "Did you run wip-test-dependents or otherwise test all dependent ports? y/[n] "
+# printf "Dependent ports are:\n"
+# port-show-dependents
+
 # Make sure port is listed in category/Makefile
 port_name=$(echo $port | cut -d / -f 2)
 if ! fgrep -qw $port_name $makefile; then
