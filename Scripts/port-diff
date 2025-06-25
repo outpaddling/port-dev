@@ -72,14 +72,15 @@ if grep -q '^CATEGORIES.*wip' Makefile; then
     sed -i .bak -e "/^CATEGORIES/s|wip ||" Makefile
     mv Makefile.bak /tmp/Makefile.bak.$portname
 fi
-rm -f patch.$portname
+patch=/tmp/patch.$portname
+rm -f $patch
 if ! diff -ruN --exclude=CVS --exclude=.svn \
 	  /usr/ports/$category/$old_portname `pwd` > /dev/null; then
     # Send patch direct to file.  Copy and paste from terminal may convert
     # tabs to spaces.
     diff -ruN --exclude=CVS --exclude=.svn \
-	  /usr/ports/$category/$old_portname `pwd` > patch.$portname || true
-    more patch.$portname
+	  /usr/ports/$category/$old_portname `pwd` > $patch || true
+    more $patch
     if [ 0$wip = 01 ]; then
 	mv /tmp/Makefile.bak.$portname Makefile
     fi
@@ -96,10 +97,15 @@ fi
 
 category=$(basename $(dirname $(pwd)))
 
-cat << EOM | more
+printf "Remove $patch? [y]/n "
+read remove
+if [ 0"$remove" != 0n ]; then
+    rm -f $patch
+else
+    cat << EOM | more
 ===
 
-Submit a PR with the patch.$portname attached.
+Submit a PR with the $patch attached.
 
 Summary examples: See porter's guide for details.
     
@@ -119,6 +125,7 @@ Class:      New port:   change-request
 			change-request if not
 	    
 EOM
+fi
 
 if [ -e pkg-descr ]; then
     printf "\npkg-descr:\n\n"
