@@ -55,6 +55,7 @@ if [ 0$proceed = 0y ]; then
 
     printf "Stashing local mods...\n"
     git stash push Mk/bsd.local.mk
+    git pull -r
     
     printf "Comitting...\n"
     git cherry-pick -x $commit
