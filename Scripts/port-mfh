@@ -53,8 +53,18 @@ if [ 0$proceed = 0y ]; then
     printf "Ensuring we're on the $branch branch...\n"
     git checkout $branch
 
-    printf "Stashing local mods...\n"
-    git stash push Mk/bsd.local.mk
+    # bsd.local.mk has been moved to bsd.local.mk.sample.
+    # If ports tree is out of date, it may still be tracked.
+    stash_file=Mk/bsd.local.mk
+    if git ls-files --error-unmatch $stash_file > /dev/null 2>&1 \
+	&& ! git diff --quiet $stash_file; then
+	stash=1
+    fi
+    if [ 0$stash = 01 ]; then
+	printf "Stashing $stash_file...\n"
+	git stash push Mk/$stash_file || true
+    fi
+
     git pull -r
     
     printf "Comitting...\n"
@@ -63,8 +73,10 @@ if [ 0$proceed = 0y ]; then
     printf "Pushing commits...\n"
     git push
     
-    printf "Unstashing...\n"
-    git stash pop
+    if [ 0$stash = 01 ]; then
+	printf "Unstashing...\n"
+	git stash pop || true   # Returns non-zero if nothing stashed
+    fi
     
     printf "Returning to main branch...\n"
     git checkout main
