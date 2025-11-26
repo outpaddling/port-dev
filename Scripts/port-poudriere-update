@@ -16,9 +16,23 @@ if [ 0$up2date = 0y ]; then
     done
     : ${POUDRIERE_PORTS:=/usr/local/poudriere/ports/default}
     cd $POUDRIERE_PORTS
-    git stash push Mk/bsd.local.mk
+
+    # bsd.local.mk has been moved to bsd.local.mk.sample.
+    # If ports tree is out of date, it may still be tracked.
+    stash_file=Mk/bsd.local.mk
+    if git ls-files --error-unmatch $stash_file > /dev/null 2>&1 \
+	&& ! git diff --quiet $stash_file; then
+	stash=1
+    fi
+    if [ 0$stash = 01 ]; then
+	printf "Stashing $stash_file...\n"
+	git stash push $stash_file || true
+    fi
     poudriere ports -u
-    git stash pop
+    if [ 0$stash = 01 ]; then
+	printf "Unstashing...\n"
+	git stash pop || true   # Returns non-zero if nothing stashed
+    fi
 else
     # Terminate caller (e.g. wip-poudriere-test) if user selects poudriere
     # update and says system is out of date
