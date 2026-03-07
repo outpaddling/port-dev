@@ -32,6 +32,11 @@ usage()
 #   Main
 ##########################################################################
 
+if [ 0$1 = 0--keep-patch ]; then
+    keep_patch=true
+    shift
+fi
+
 if [ $# -gt 1 ]; then
     usage
 fi
@@ -97,15 +102,14 @@ fi
 
 category=$(basename $(dirname $(pwd)))
 
-printf "Remove $patch? [y]/n "
-read remove
-if [ 0"$remove" != 0n ]; then
+# FIXME: Maybe drop the whole heredoc and just remove the patch
+if [ 0$keep_patch != 0true ]; then
     rm -f $patch
 else
     cat << EOM | more
 ===
 
-Submit a PR with the $patch attached.
+Submit a PR with $patch attached.
 
 Summary examples: See porter's guide for details.
     
