@@ -1,0 +1,44 @@
+#!/bin/sh -e
+
+##########################################################################
+#   Synopsis:
+#       port-install-build-deps
+#       
+#   Description:
+#       .B port-install-build-deps
+#       determines the BUILD_DEPENDS for the port in the current
+#       working directory using
+#       .B make build-depends-list
+#       and attempts to install all build dependencies using pkg.
+#       This significantly reduces the time required for a build
+#       in the event that not all dependencies are installed.
+#       
+#   Arguments:
+#       None
+#       
+#   Returns:
+#       0 on success, non-zero error codes otherwise
+#
+#   See also:
+#       port-check(1), port-reinstall(1), port-remake(1)
+##########################################################################
+
+usage()
+{
+    printf "Usage: $0\n"
+    exit 64     # sysexits(3) EX_USAGE
+}
+
+
+##########################################################################
+#   Main
+##########################################################################
+
+if [ $# != 0 ]; then
+    usage
+fi
+
+depends=$(make build-depends-list)
+pkgs=`for depend in $depends; do (cd $depend && make -V PKGBASE); done`
+printf "$pkgs\n"
+pkg install -Ay $pkgs
