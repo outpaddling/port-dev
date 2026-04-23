@@ -2,19 +2,20 @@
 
 ##########################################################################
 #   Synopsis:
-#       port-install-build-deps
+#       port-install-deps all|build|run
 #       
 #   Description:
-#       .B port-install-build-deps
-#       determines the BUILD_DEPENDS for the port in the current
-#       working directory using
-#       .B make build-depends-list
-#       and attempts to install all build dependencies using pkg.
+#       .B port-install-deps
+#       determines the BUILD_DEPENDS, RUN_DEPENDS or all dependencies
+#       including LIB_DEPENDS,
+#       for the port in the current working directory using
+#       .B make all-depends-list, make build-depends-list, or make run-depends-list,
+#       and attempts to install all listed dependencies using pkg.
 #       This significantly reduces the time required for a build
-#       in the event that not all dependencies are installed.
+#       in the event that not all dependencies are already installed.
 #       
 #   Arguments:
-#       None
+#       all, build, or run (prefix to supported -depends-list make targets)
 #       
 #   Returns:
 #       0 on success, non-zero error codes otherwise
@@ -25,7 +26,7 @@
 
 usage()
 {
-    printf "Usage: $0\n"
+    printf "Usage: $0 [all|build|run]\n"
     exit 64     # sysexits(3) EX_USAGE
 }
 
@@ -34,11 +35,23 @@ usage()
 #   Main
 ##########################################################################
 
-if [ $# != 0 ]; then
-    usage
-fi
+case $# in
+0)
+    stage=all
+    ;;
 
-depends=$(make build-depends-list)
+1)
+    stage=$1
+    ;;
+
+*)
+    usage
+    ;;
+
+esac
+
+set -x
+depends=$(make $stage-depends-list)
 pkgs=`for depend in $depends; do (cd $depend && make -V PKGBASE); done`
 printf "$pkgs\n"
-pkg install -Ay $pkgs
+pkg install -Ay --ignore-missing $pkgs
