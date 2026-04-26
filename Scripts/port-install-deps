@@ -50,8 +50,12 @@ case $# in
 
 esac
 
-set -x
+printf "Finding $stage dependencies.  This can take a long time...\n"
 depends=$(make $stage-depends-list)
 pkgs=`for depend in $depends; do (cd $depend && make -V PKGBASE); done`
 printf "$pkgs\n"
-pkg install -Ay --ignore-missing $pkgs
+pkg update
+set +e
+for dep in $pkgs; do
+    pkg install -Ay --no-repo-update $dep
+done
