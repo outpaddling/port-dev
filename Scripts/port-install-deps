@@ -26,7 +26,7 @@
 
 usage()
 {
-    printf "Usage: $0 [all|build|run]\n"
+    printf "Usage: $0 [all | build|run [build|run]\n"
     exit 64     # sysexits(3) EX_USAGE
 }
 
@@ -37,25 +37,34 @@ usage()
 
 case $# in
 0)
-    stage=all
-    ;;
-
-1)
-    stage=$1
+    stages=all
     ;;
 
 *)
-    usage
+    stages="$@"
     ;;
 
 esac
 
-printf "Finding $stage dependencies.  This can take a long time...\n"
-depends=$(make $stage-depends-list)
-pkgs=`for depend in $depends; do (cd $depend && make -V PKGBASE); done`
-printf "$pkgs\n"
-pkg update
-set +e
-for dep in $pkgs; do
-    pkg install -Ay --no-repo-update $dep
+for stage in $stages; do
+    case $stage in
+    build|run)
+	;;
+    
+    *)
+	usage
+	;;
+    esac
+done
+
+for stage in $stages; do
+    printf "Finding $stage dependencies.  This can take a long time...\n"
+    depends=$(make $stage-depends-list)
+    pkgs=`for depend in $depends; do (cd $depend && make -V PKGBASE); done`
+    printf "$pkgs\n"
+    pkg update
+    set +e
+    for dep in $pkgs; do
+	pkg install -Ay --no-repo-update $dep
+    done
 done
