@@ -37,7 +37,7 @@ usage()
 
 case $# in
 0)
-    stages=all
+    stages="build run"
     ;;
 
 *)
