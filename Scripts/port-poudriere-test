@@ -13,7 +13,7 @@ usage()
 {
     cat << EOM
 
-Usage: $0 category/port all|pattern|jailname [pattern|jailname ...]
+Usage: $0 category/port [all|pattern|jailname [pattern|jailname ...]]
 
 Examples:
 
@@ -54,7 +54,7 @@ pause()
 #   Main
 ##########################################################################
 
-if [ $# -lt 2 ]; then
+if [ $# -lt 1 ]; then
     usage
 fi
 
@@ -62,7 +62,11 @@ args=$#
 invoked_as=$(basename $0)
 port=$1
 shift
-jails="$@"
+if [ $# = 0 ]; then
+    jails=all
+else
+    jails="$@"
+fi
 umask 022
 
 if [ "$jails" = all ]; then
