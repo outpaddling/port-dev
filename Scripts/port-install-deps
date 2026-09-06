@@ -2,7 +2,7 @@
 
 ##########################################################################
 #   Synopsis:
-#       port-install-deps all|build|run
+#       port-install-deps [all|build|run [build|run]]
 #       
 #   Description:
 #       .B port-install-deps
@@ -26,7 +26,7 @@
 
 usage()
 {
-    printf "Usage: $0 [all | build|run [build|run]\n"
+    printf "Usage: $0 [all|build|run [build|run]\n"
     exit 64     # sysexits(3) EX_USAGE
 }
 
@@ -48,7 +48,7 @@ esac
 
 for stage in $stages; do
     case $stage in
-    build|run)
+    all|build|run)
 	;;
     
     *)
