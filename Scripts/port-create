@@ -85,7 +85,9 @@ cat << EOM > Makefile
 PORTNAME=${tab}$port
 DISTVERSION=${tab}
 CATEGORIES=${tab}wip $category
-MASTER_SITES=${tab}
+# Use assets not in /archive if available.
+# USE_GITHUB uses temporary distfiles.
+MASTER_SITES=${tab}https://github.com/account/project/releases/download/version/
 
 MAINTAINER=${tab}$maintainer
 COMMENT=${tab}
