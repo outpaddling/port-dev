@@ -63,13 +63,6 @@ while [ 0$another = 0y ]; do
     printf "Existing poudriere jails:\n\n"
     poudriere jail -l
 
-    cat << EOM
-
-On amd64 systems, you can create either amd64 or i386 jails.
-
-For other architectures, accept the default below.
-
-EOM
     default_arch=`uname -p`
     printf "Processor architecture? [$default_arch] "
     read arch
@@ -104,15 +97,6 @@ EOM
 	set +x
     else
 	printf "Jail $name already exists.\n"
-    fi
-    
-    if [ $arch = amd64 ]; then
-	name=`echo $release | cut -d - -f 1 | tr '.' '-'`-i386
-	printf "Create $name as well? y/[n] "
-	read i386
-	if [ 0"$i386" = 0y ]; then
-	    poudriere jail -c -j "$name" -v $release -a i386 || true
-	fi
     fi
     
     printf "Create another jail for an older release? y/[n] "
