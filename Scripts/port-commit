@@ -80,6 +80,8 @@ fi
 pause
 git diff $port $makefile || true
 pause
+git diff --cached $port $makefile || true
+pause
 
 read -p 'Proceed with commit? y/[n] ' proceed
 if [ 0$proceed = 0y ]; then
