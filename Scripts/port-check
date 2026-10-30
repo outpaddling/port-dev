@@ -86,7 +86,7 @@ if [ 0$clean = 0y ]; then
 fi
 
 read -p "Deinstall package and dependencies? y/[n] " remove
-if [ 0$clean = 0y ]; then
+if [ 0$remove = 0y ]; then
     make deinstall
     pkg autoremove
 fi
