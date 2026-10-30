@@ -84,3 +84,9 @@ read -p "Clean? y/[n] " clean
 if [ 0$clean = 0y ]; then
     make clean
 fi
+
+read -p "Deinstall package and dependencies? y/[n] " remove
+if [ 0$clean = 0y ]; then
+    make deinstall
+    pkg autoremove
+fi
